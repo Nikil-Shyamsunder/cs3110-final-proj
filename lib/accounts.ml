@@ -1,13 +1,13 @@
 module Account = struct end
 
 module Pharmacist = struct
-  include Patient
+  include Account
 end
 
 module Patient = struct
-  include Patient
+  include Account
 end
 
 module Doctor = struct
-  include Patient
+  include Account
 end
