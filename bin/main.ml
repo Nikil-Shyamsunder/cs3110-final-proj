@@ -14,7 +14,7 @@ let welcome_message () =
 let auth username pw = true
 
 (** Dummy Signup*)
-let signup username pw = ()
+let create_account username pw = ()
 
 (* Function to authenticate a user *)
 let login () =
@@ -32,7 +32,7 @@ let signup () =
   print_endline "Create a password:";
   let password = read_line () in
   (* Assuming a signup function is available *)
-  signup username password;
+  create_account username password;
   print_endline "Signup successful!";
   Some username
 
