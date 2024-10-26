@@ -1,0 +1,4 @@
+(executable
+ (public_name prescription_validator)
+ (name main)
+ (libraries prescription_validator))
