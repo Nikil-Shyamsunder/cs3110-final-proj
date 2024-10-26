@@ -14,7 +14,7 @@ let welcome_message () =
 let auth username pw = true
 
 (** Dummy Signup*)
-let create_account username pw = ()
+let create_account username pw role = ()
 
 (* Function to authenticate a user *)
 let login () =
@@ -31,8 +31,10 @@ let signup () =
   let username = read_line () in
   print_endline "Create a password:";
   let password = read_line () in
+  print_endline "Enter your role ('patient, 'pharmacist', or 'doctor'):";
+  let role = read_line () in
   (* Assuming a signup function is available *)
-  create_account username password;
+  create_account username password role;
   print_endline "Signup successful!";
   Some username
 
