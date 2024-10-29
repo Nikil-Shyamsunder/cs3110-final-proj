@@ -6,8 +6,6 @@ module VoteTally = struct
 end
 
 module Task = struct
-  include VoteTally
-
   type t = {
     task_id : int;
     prescription : string;
