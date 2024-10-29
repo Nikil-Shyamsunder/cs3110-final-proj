@@ -10,7 +10,11 @@ module Account = struct
     password : string;
     task_list : int list;
   }
-
+  
+  let role_display = function
+    | Doctor -> "Doctor"
+    | Pharmacist -> "Pharmacist"
+    | Patient -> "Patient"
   let role_to_string = function
     | Patient -> "patient"
     | Doctor -> "doctor"

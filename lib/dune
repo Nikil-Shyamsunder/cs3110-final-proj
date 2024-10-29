@@ -1,2 +1,3 @@
 (library
- (name prescription_validator))
+ (name prescription_validator)
+ (libraries csv))
