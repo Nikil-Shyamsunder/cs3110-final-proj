@@ -1,5 +1,12 @@
 [@@@warning "-a"]
 
+open Prescription_validator.Accounts
+module Auth = Prescription_validator.Accounts.Authenticator
+module Account = Prescription_validator.Accounts.Account
+module Pharmacist = Prescription_validator.Accounts.Pharmacist
+module Doctor = Prescription_validator.Accounts.Doctor
+module Patient = Prescription_validator.Accounts.Patient
+
 (* =========================== DRIVER PROGRAM =========================== *)
 (* Prescription Validator Program *)
 
@@ -10,8 +17,9 @@ let welcome_message () =
   print_endline "1. Login";
   print_endline "2. Signup"
 
-(** Dummy Authenticator*)
-let auth username pw = true
+(* Authenticator*)
+let auth username pw =
+  Auth.authenticate username pw (Auth.load_users "data/accounts.csv")
 
 (** Dummy Signup*)
 let create_account username pw role = ()
@@ -23,7 +31,12 @@ let login () =
   print_endline "Enter password:";
   let password = read_line () in
   (* Assuming an auth function is available *)
-  if auth username password then Some username else None
+  let usr_info = auth username password in
+  match usr_info with
+  | Some (u, p, r) ->
+      print_endline "Success!";
+      (u, p, r)
+  | None -> failwith "Login Failed."
 
 (* Function to register a new user *)
 let signup () =
@@ -34,19 +47,24 @@ let signup () =
   print_endline "Enter your role ('patient, 'pharmacist', or 'doctor'):";
   let role = read_line () in
   (* Assuming a signup function is available *)
-  create_account username password role;
+  let _ = create_account username password role in
   print_endline "Signup successful!";
   Some username
 
-(* Placeholder function for patient's tasks *)
-let show_patient () =
-  print_endline "Here are your tasks as a patient:";
-  print_endline "- Task 1: Take prescribed medication";
-  print_endline "- Task 2: Schedule follow-up appointment"
+(* Placeholder function for patient loop *)
+let patient_driver username pwd role =
+  let usr = Patient.create_user username pwd role in
+  print_endline
+    ("Welcome patient " ^ username
+   ^ ": Here are your outstanding prescriptions:");
+  print_endline "- Prescription 1: Tylenol for headaches: Approved!";
+  print_endline "- Prescription 2: Amoxicillin for strep: Pending approval..."
 
-(* Placeholder function for doctor's input *)
-let doctor_form () =
-  print_endline "Doctor, please input diagnosis and prescription:";
+(* Placeholder function for doctor loop *)
+let doctor_driver username pwd role =
+  let usr = Doctor.create_user username pwd role in
+  print_endline
+    ("Doctor " ^ username ^ ", enter a new task to publish to blockchain:");
   print_endline "Enter diagnosis:";
   let diagnosis = read_line () in
   print_endline "Enter prescription:";
@@ -54,9 +72,11 @@ let doctor_form () =
   print_endline "Diagnosis and prescription recorded."
 
 (* Placeholder function for pharmacist tasks *)
-let all_tasks () =
-  print_endline "Here are the tasks for pharmacists:";
-  print_endline "(1) Verify prescription:"
+let pharmacist_driver username pwd role =
+  let usr = Pharmacist.create_user username pwd role in
+  print_endline ("Pharmacist " ^ username ^ ", here are your tasks:");
+  print_endline "(1) Verify Prescription: Amoxicillin for strep";
+  print_endline "(2) Verify prescription: Trimethoprim for UTI: "
 ;;
 
 (* Entrypoint *)
@@ -64,20 +84,15 @@ welcome_message ();
 match read_int_opt () with
 | Some 1 -> (
     (* Login flow *)
-    match login () with
-    | Some username -> (
-        (* Placeholder roles for simplicity. Replace with actual role checks *)
-        let role = "patient" in
-        (* or "doctor" or "pharmacist" *)
-        match role with
-        | "patient" -> show_patient ()
-        | "doctor" -> doctor_form ()
-        | "pharmacist" -> all_tasks ()
-        | _ -> print_endline "Invalid role.")
-    | None -> print_endline "Login failed.")
+    let u, p, r = login () in
+    match r with
+    | "patient" -> patient_driver u p r
+    | "doctor" -> doctor_driver u p r
+    | "pharmacist" -> pharmacist_driver u p r
+    | _ -> failwith "Invalid role")
 | Some 2 -> (
     (* Signup flow *)
     match signup () with
     | Some username -> print_endline ("Welcome, " ^ username)
-    | None -> print_endline "Signup failed.")
-| _ -> print_endline "Invalid option. Please try again."
+    | None -> print_endline "Signup failed."
+    | _ -> print_endline "Invalid option. Please try again.")

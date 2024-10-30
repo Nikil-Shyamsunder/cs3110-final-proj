@@ -1,6 +1,12 @@
+(* authenticator.ml *)
 module Authenticator : sig
   val load_users : string -> (string * string * string) list
-  val authenticate : string -> string -> (string * string * string) list -> bool
+
+  val authenticate :
+    string ->
+    string ->
+    (string * string * string) list ->
+    (string * string * string) option
 end = struct
   (* Helper function to split a string by commas *)
   let split_by_comma line =
@@ -24,7 +30,7 @@ end = struct
 
   (* Authenticate a user by username and password *)
   let authenticate username password users =
-    List.exists (fun (u, p, _) -> u = username && p = password) users
+    List.find_opt (fun (u, p, r) -> u = username && p = password) users
 end
 
 module Account = struct
@@ -63,6 +69,8 @@ module Account = struct
       role = string_to_role role_op;
       task_list = [];
     }
+
+  let role acc = acc.role
 end
 
 module Pharmacist = struct
