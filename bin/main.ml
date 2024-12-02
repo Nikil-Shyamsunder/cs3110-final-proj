@@ -10,6 +10,8 @@ module Patient = Prescription_validator.Accounts.Patient
 (* =========================== DRIVER PROGRAM =========================== *)
 (* Prescription Validator Program *)
 
+(* Set file paths *)
+
 (* Welcome message *)
 let welcome_message () =
   print_endline "Welcome to the Prescription Validator!";
@@ -21,8 +23,14 @@ let welcome_message () =
 let auth username pw =
   Auth.authenticate username pw (Auth.load_users "data/accounts.csv")
 
-(** Dummy Signup*)
-let create_account username pw role = ()
+(* Function to write an account to a CSV file *)
+let create_account username pw role =
+  let filename = "data/accounts.csv" in
+  let out_channel = open_out_gen [ Open_append; Open_creat ] 0o666 filename in
+  Printf.fprintf out_channel "%s,%s,%s\n" username pw role;
+  close_out out_channel;
+  Printf.printf
+    "Successfully created %s. Quitting program, restart and login.\n" username
 
 (* Function to authenticate a user *)
 let login () =
@@ -47,9 +55,7 @@ let signup () =
   print_endline "Enter your role ('patient, 'pharmacist', or 'doctor'):";
   let role = read_line () in
   (* Assuming a signup function is available *)
-  let _ = create_account username password role in
-  print_endline "Signup successful!";
-  Some username
+  create_account username password role
 
 (* Placeholder function for patient loop *)
 let patient_driver username pwd role =
@@ -90,9 +96,6 @@ match read_int_opt () with
     | "doctor" -> doctor_driver u p r
     | "pharmacist" -> pharmacist_driver u p r
     | _ -> failwith "Invalid role")
-| Some 2 -> (
+| Some 2 ->
     (* Signup flow *)
-    match signup () with
-    | Some username -> print_endline ("Welcome, " ^ username)
-    | None -> print_endline "Signup failed."
-    | _ -> print_endline "Invalid option. Please try again.")
+    signup ()
