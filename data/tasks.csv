@@ -1,4 +1,3 @@
-1,Take medication A,3,101,102,103
-2,Complete daily exercise,4,201,202,203,204
-3,Check blood pressure,2,301,302
-4,Schedule next appointment,1,401
+1,Flu,Rest and hydration,5,"['user1', 'user2', 'user3', 'user4', 'user5']",2,"['user6', 'user7']"
+2,COVID-19,Isolation and antiviral drugs,10,"['user8', 'user9', 'user10', 'user11', 'user12', 'user13', 'user14', 'user15', 'user16', 'user17']",1,"['user18']"
+3,Diabetes,Insulin therapy,3,"['user19', 'user20', 'user21']",4,"['user22', 'user23', 'user24', 'user25']"

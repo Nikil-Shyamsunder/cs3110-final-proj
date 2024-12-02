@@ -1,7 +1,9 @@
 module VoteTally = struct
   type t = {
-    voter_id : int list;
-    total_votes : int;
+    yes_votes : int;
+    yes_voters : string list;
+    no_votes : int;
+    no_voters : string list;
   }
 end
 
