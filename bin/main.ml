@@ -11,6 +11,7 @@ module Patient = Prescription_validator.Accounts.Patient
 (* Prescription Validator Program *)
 
 (* Set file paths *)
+let accounts_path = "data/accounts.csv"
 
 (* Welcome message *)
 let welcome_message () =
@@ -21,11 +22,11 @@ let welcome_message () =
 
 (* Authenticator*)
 let auth username pw =
-  Auth.authenticate username pw (Auth.load_users "data/accounts.csv")
+  Auth.authenticate username pw (Auth.load_users accounts_path)
 
 (* Function to write an account to a CSV file *)
 let create_account username pw role =
-  let filename = "data/accounts.csv" in
+  let filename = accounts_path in
   let out_channel = open_out_gen [ Open_append; Open_creat ] 0o666 filename in
   Printf.fprintf out_channel "%s,%s,%s\n" username pw role;
   close_out out_channel;
