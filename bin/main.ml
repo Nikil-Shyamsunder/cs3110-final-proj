@@ -6,12 +6,14 @@ module Account = Prescription_validator.Accounts.Account
 module Pharmacist = Prescription_validator.Accounts.Pharmacist
 module Doctor = Prescription_validator.Accounts.Doctor
 module Patient = Prescription_validator.Accounts.Patient
+module Task = Prescription_validator.Task.Task
 
 (* =========================== DRIVER PROGRAM =========================== *)
 (* Prescription Validator Program *)
 
 (* Set file paths *)
 let accounts_path = "data/accounts.csv"
+let tasks_path = "data/tasks.csv"
 
 (* Welcome message *)
 let welcome_message () =
@@ -84,7 +86,8 @@ let pharmacist_driver username pwd role =
   print_endline ("Pharmacist " ^ username ^ ", here are your tasks:");
   print_endline "(1) Verify Prescription: Amoxicillin for strep";
   print_endline "(2) Verify prescription: Trimethoprim for UTI: "
-;;
+
+let tasks = Task.load_tasks_from_csv tasks_path;;
 
 (* Entrypoint *)
 welcome_message ();
