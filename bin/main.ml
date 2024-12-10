@@ -75,11 +75,17 @@ let doctor_driver username pwd role =
   let usr = Doctor.create_user username pwd role in
   print_endline
     ("Doctor " ^ username ^ ", enter a new task to publish to blockchain:");
+  print_endline
+    "Who is the relevant patient (This information will NOT go on the \
+     blockchain):";
+  let patient = read_line () in
   print_endline "Enter diagnosis:";
   let diagnosis = read_line () in
   print_endline "Enter prescription:";
   let prescription = read_line () in
-  Doctor.add_diagnosis_prescription tasks_path diagnosis prescription
+
+  Doctor.add_diagnosis_prescription tasks_path accounts_path username patient
+    diagnosis prescription
 
 (* Placeholder function for pharmacist tasks *)
 let pharmacist_driver username pwd role =

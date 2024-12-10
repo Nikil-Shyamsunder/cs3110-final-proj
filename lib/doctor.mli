@@ -13,4 +13,5 @@ val create_user : string -> string -> string -> t
 val role : t -> role
 (** [role acc] returns the role of the user [acc]. *)
 
-val add_diagnosis_prescription : string -> string -> string -> unit
+val add_diagnosis_prescription :
+  string -> string -> string -> string -> string -> string -> unit
