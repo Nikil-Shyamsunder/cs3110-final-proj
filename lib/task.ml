@@ -65,3 +65,42 @@ let display_single_task task =
 let display_tasks filepath =
   let tasks = load_tasks_from_csv filepath in
   List.iter display_single_task tasks
+
+let display_tasks_from_ids tasks_path task_ids =
+  (* Load the tasks CSV *)
+  let tasks_csv = Csv.load tasks_path in
+
+  (* Helper function to find a task by task ID in the tasks CSV *)
+  let find_task tasks_csv task_id =
+    List.find_opt
+      (fun row ->
+        match row with
+        | id :: _ when int_of_string id = task_id -> true
+        | _ -> false)
+      tasks_csv
+  in
+
+  if task_ids = [] then Printf.printf "There are no tasks to display.\n"
+  else (
+    (* Print a header with fixed-width columns *)
+    Printf.printf "%-8s | %-15s | %-15s | %-8s | %-8s\n" "Task ID" "Diagnosis"
+      "Prescription" "Yes Vote" "No Vote";
+    Printf.printf
+      "--------------------------------------------------------------\n";
+
+    (* For each task ID, find and print the corresponding task *)
+    List.iter
+      (fun task_id ->
+        match find_task tasks_csv task_id with
+        | None -> Printf.printf "Task with ID %d not found in tasks.\n" task_id
+        | Some task_row ->
+            (* Extract the desired columns: Task ID, Diagnosis, Prescription,
+               Yes Vote, No Vote *)
+            let task_id = List.nth task_row 0 in
+            let diagnosis = List.nth task_row 1 in
+            let prescription = List.nth task_row 2 in
+            let yes_vote = List.nth task_row 3 in
+            let no_vote = List.nth task_row 5 in
+            Printf.printf "%-8s | %-15s | %-15s | %-8s | %-8s\n" task_id
+              diagnosis prescription yes_vote no_vote)
+      task_ids)

@@ -12,3 +12,6 @@ val create_user : string -> string -> string -> t
 
 val role : t -> role
 (** [role acc] returns the role of the user [acc]. *)
+
+val find_user : string -> string -> string list option
+val get_user_task_list : string -> string -> int list option

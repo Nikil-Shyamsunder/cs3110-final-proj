@@ -105,3 +105,5 @@ match read_int_opt () with
 | Some 2 ->
     (* Signup flow *)
     signup ()
+| Some n -> failwith "Invalid number; try again. Exiting the program..."
+| None -> failwith "Invalid input; try again. Exiting the program."
