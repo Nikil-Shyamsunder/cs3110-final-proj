@@ -86,9 +86,10 @@ let doctor_driver username pwd role =
 (* Placeholder function for pharmacist tasks *)
 let pharmacist_driver username pwd role =
   let usr = Pharmacist.create_user username pwd role in
-  print_endline ("Pharmacist " ^ username ^ ", here are your tasks:");
-  print_endline "(1) Verify Prescription: Amoxicillin for strep";
-  print_endline "(2) Verify prescription: Trimethoprim for UTI: "
+  Pharmacist.vote_on_task accounts_path tasks_path username
+(* print_endline ("Pharmacist " ^ username ^ ", here are your tasks:");
+   print_endline "(1) Verify Prescription: Amoxicillin for strep"; print_endline
+   "(2) Verify prescription: Trimethoprim for UTI: " *)
 ;;
 
 (* Entrypoint *)
