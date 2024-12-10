@@ -2,7 +2,7 @@
 let split_by_comma line =
   let parts = String.split_on_char ',' line in
   match parts with
-  | [ username; password; role ] -> (username, password, role)
+  | [ username; password; role; data ] -> (username, password, role, data)
   | _ -> failwith "Malformed CSV line"
 
 (* Load users from CSV file *)
@@ -20,4 +20,4 @@ let load_users filename =
 
 (* Authenticate a user by username and password *)
 let authenticate username password users =
-  List.find_opt (fun (u, p, r) -> u = username && p = password) users
+  List.find_opt (fun (u, p, _, _) -> u = username && p = password) users

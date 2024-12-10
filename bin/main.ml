@@ -30,7 +30,8 @@ let auth username pw =
 let create_account username pw role =
   let filename = accounts_path in
   let out_channel = open_out_gen [ Open_append; Open_creat ] 0o666 filename in
-  Printf.fprintf out_channel "%s,%s,%s\n" username pw role;
+  (* Write the account information with the fourth column as an empty list *)
+  Printf.fprintf out_channel "%s,%s,%s,\"[]\"\n" username pw role;
   close_out out_channel;
   Printf.printf
     "Successfully created %s. Quitting program, restart and login.\n" username
@@ -44,9 +45,9 @@ let login () =
   (* Assuming an auth function is available *)
   let usr_info = auth username password in
   match usr_info with
-  | Some (u, p, r) ->
+  | Some usr ->
       print_endline "Success!";
-      (u, p, r)
+      usr
   | None -> failwith "Login Failed."
 
 (* Function to register a new user *)
@@ -93,7 +94,7 @@ welcome_message ();
 match read_int_opt () with
 | Some 1 -> (
     (* Login flow *)
-    let u, p, r = login () in
+    let u, p, r, lst = login () in
     match r with
     | "patient" -> patient_driver u p r
     | "doctor" -> doctor_driver u p r
