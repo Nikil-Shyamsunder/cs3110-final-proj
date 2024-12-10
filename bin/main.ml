@@ -13,6 +13,8 @@ module Task = Prescription_validator.Task
 (* Set file paths *)
 let accounts_path = "data/accounts.csv"
 let tasks_path = "data/tasks.csv"
+let accounts_csv = ref (Csv.load accounts_path)
+let tasks_csv = ref (Csv.load tasks_path)
 let tasks = Task.load_tasks_from_csv tasks_path
 
 (* Welcome message *)
@@ -45,9 +47,9 @@ let login () =
   (* Assuming an auth function is available *)
   let usr_info = auth username password in
   match usr_info with
-  | Some usr ->
+  | Some (u, p, r, lst) ->
       print_endline "Success!";
-      usr
+      (u, p, r, Task.string_to_task_ids lst)
   | None -> failwith "Login Failed."
 
 (* Function to register a new user *)
@@ -62,12 +64,12 @@ let signup () =
   create_account username password role
 
 (* Placeholder function for patient loop *)
-let patient_driver username pwd role =
-  let usr = Patient.create_user username pwd role in
-  Patient.display_prescription_statuses accounts_path tasks_path username
+let patient_driver username pwd role lst =
+  let usr = Patient.create_user username pwd role lst in
+  Patient.display_prescription_statuses tasks_csv usr
 
 (* Placeholder function for doctor loop *)
-let doctor_driver username pwd role =
+let doctor_driver username pwd role lst =
   let usr = Doctor.create_user username pwd role in
   print_endline
     ("Doctor " ^ username ^ ", enter a new task to publish to blockchain:");
@@ -80,16 +82,13 @@ let doctor_driver username pwd role =
   print_endline "Enter prescription:";
   let prescription = read_line () in
 
-  Doctor.add_diagnosis_prescription tasks_path accounts_path username patient
+  Doctor.add_diagnosis_prescription tasks_csv accounts_csv username patient
     diagnosis prescription
 
 (* Placeholder function for pharmacist tasks *)
-let pharmacist_driver username pwd role =
-  let usr = Pharmacist.create_user username pwd role in
-  Pharmacist.vote_on_task accounts_path tasks_path username
-(* print_endline ("Pharmacist " ^ username ^ ", here are your tasks:");
-   print_endline "(1) Verify Prescription: Amoxicillin for strep"; print_endline
-   "(2) Verify prescription: Trimethoprim for UTI: " *)
+let pharmacist_driver username pwd role lst =
+  let usr = Pharmacist.create_user username pwd role lst in
+  Pharmacist.vote_on_task accounts_csv tasks_csv usr
 ;;
 
 (* Entrypoint *)
@@ -99,12 +98,16 @@ match read_int_opt () with
     (* Login flow *)
     let u, p, r, lst = login () in
     match r with
-    | "patient" -> patient_driver u p r
-    | "doctor" -> doctor_driver u p r
-    | "pharmacist" -> pharmacist_driver u p r
+    | "patient" -> patient_driver u p r lst
+    | "doctor" -> doctor_driver u p r lst
+    | "pharmacist" -> pharmacist_driver u p r lst
     | _ -> failwith "Invalid role")
 | Some 2 ->
     (* Signup flow *)
     signup ()
 | Some n -> failwith "Invalid number; try again. Exiting the program..."
 | None -> failwith "Invalid input; try again. Exiting the program."
+;;
+
+Csv.save accounts_path !accounts_csv;
+Csv.save tasks_path !tasks_csv

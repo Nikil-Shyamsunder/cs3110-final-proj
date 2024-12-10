@@ -1,4 +1,4 @@
-1,Flu,Rest and hydration,5,"['user1', 'user2', 'user3', 'user4', 'user5']",2,"['user6', 'user7']"
+1,Flu,Rest and hydration,6,"[pharm,'user1','user2','user3','user4','user5']",2,"['user6', 'user7']"
 2,COVID-19,Isolation and antiviral drugs,10,"['user8', 'user9', 'user10', 'user11', 'user12', 'user13', 'user14', 'user15', 'user16', 'user17']",1,['user18']
 3,Diabetes,Insulin therapy,3,"['user19', 'user20', 'user21']",4,"['user22', 'user23', 'user24', 'user25']"
 4,flu,tylenol,0,[],0,[]
@@ -6,3 +6,4 @@
 6,covid,vaccine,0,[],0,[]
 7,strep,antibiotic,0,[],1,[pharm]
 8,elephantitis,nothing,0,[],0,[]
+9,covid-20,death,0,[],0,[]

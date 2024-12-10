@@ -46,30 +46,7 @@ let load_tasks_from_csv filepath =
   let csv_data = Csv.load filepath in
   List.map parse_task csv_data
 
-(** [display_single_task task] to display a task *)
-let display_single_task task =
-  Printf.printf
-    "Task ID: %d\n\
-     Diagnosis: %s\n\
-     Prescription: %s\n\
-     Yes Votes: %d\n\
-     Yes Voters: [%s]\n\
-     No Votes: %d\n\
-     No Voters: [%s]\n\n"
-    task.task_id task.diagnosis task.prescription task.vote_count.yes_votes
-    (String.concat ", " task.vote_count.yes_voters)
-    task.vote_count.no_votes
-    (String.concat ", " task.vote_count.no_voters)
-
-(** [display_tasks filepath] displays all tasks from the CSV *)
-let display_tasks filepath =
-  let tasks = load_tasks_from_csv filepath in
-  List.iter display_single_task tasks
-
-let display_tasks_from_ids tasks_path task_ids =
-  (* Load the tasks CSV *)
-  let tasks_csv = Csv.load tasks_path in
-
+let display_tasks_from_ids (tasks_csv : Csv.t) task_ids =
   (* Helper function to find a task by task ID in the tasks CSV *)
   let find_task tasks_csv task_id =
     List.find_opt
@@ -104,3 +81,9 @@ let display_tasks_from_ids tasks_path task_ids =
             Printf.printf "%-8s | %-15s | %-15s | %-8s | %-8s\n" task_id
               diagnosis prescription yes_vote no_vote)
       task_ids)
+
+let string_to_task_ids task_list_str =
+  String.sub (String.trim task_list_str) 1 (String.length task_list_str - 2)
+  |> String.split_on_char ',' (* Split by commas *)
+  |> List.filter (fun s -> String.trim s <> "") (* Remove empty strings *)
+  |> List.map int_of_string (* Convert to integers *)

@@ -4,7 +4,7 @@ type role
 type t
 (** Type representing a user *)
 
-val create_user : string -> string -> string -> t
+val create_user : string -> string -> string -> int list -> t
 (** [create_user u p role_op] creates a new user with username [u], password
     [p], and a role specified by the string [role_op]. The [task_list] is
     initialized as an empty list. Raises: [Failure "input invalid"] if [role_op]
@@ -13,4 +13,4 @@ val create_user : string -> string -> string -> t
 val role : t -> role
 (** [role acc] returns the role of the user [acc]. *)
 
-val vote_on_task : string -> string -> string -> unit
+val vote_on_task : Csv.t ref -> Csv.t ref -> t -> unit

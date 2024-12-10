@@ -26,10 +26,12 @@ let string_to_role = function
   | "pharmacist" -> Pharmacist
   | _ -> failwith "input invalid"
 
-let create_user (u : string) (p : string) (role_op : string) =
-  { username = u; password = p; role = string_to_role role_op; task_list = [] }
+let create_user (u : string) (p : string) (role_op : string) (lst : int list) =
+  { username = u; password = p; role = string_to_role role_op; task_list = lst }
 
 let role acc = acc.role
+let username acc = acc.username
+let tasks acc = acc.task_list
 
 let find_user accounts_path username =
   let accounts_csv = Csv.load accounts_path in

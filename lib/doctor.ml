@@ -1,7 +1,7 @@
 include Account
 
 (* Helper function to update the final column of a user's row *)
-let update_user_tasks (accounts_csv : Csv.t) username task_id =
+let update_user_tasks (accounts_csv : Csv.t) (username : string) task_id =
   List.map
     (fun row ->
       match row with
@@ -19,7 +19,7 @@ let update_user_tasks (accounts_csv : Csv.t) username task_id =
                 (* Remove empty strings *)
               with _ -> []
             in
-            let new_tasks = task_id :: tasks_list in
+            let new_tasks = string_of_int task_id :: tasks_list in
             Printf.sprintf "[%s]" (String.concat "," new_tasks)
           in
           [ u; pw; role; updated_tasks ]
@@ -27,9 +27,10 @@ let update_user_tasks (accounts_csv : Csv.t) username task_id =
     accounts_csv
 
 (* Main function to add a new record and update accounts *)
-let add_diagnosis_prescription tasks_path accounts_path doctor patient diagnosis
-    prescription =
-  let csv = Csv.load tasks_path in
+let add_diagnosis_prescription (tasks_csv_ref : Csv.t ref)
+    (accounts_csv_ref : Csv.t ref) (doctor : string) (patient : string)
+    diagnosis prescription =
+  let csv = !tasks_csv_ref in
   let new_id =
     (* Compute the new ID by finding the maximum ID in the existing rows *)
     List.fold_left
@@ -43,22 +44,10 @@ let add_diagnosis_prescription tasks_path accounts_path doctor patient diagnosis
     [ string_of_int new_id; diagnosis; prescription; "0"; "[]"; "0"; "[]" ]
   in
   (* Append the new record to the CSV data *)
-  let updated_csv = csv @ [ new_record ] in
-  (* Write the updated CSV back to the file *)
-  Csv.save tasks_path updated_csv;
-
-  (* Load the accounts CSV *)
-  let accounts_csv = Csv.load accounts_path in
+  tasks_csv_ref := csv @ [ new_record ];
 
   (* Update the tasks column for the patient and doctor *)
-  let _updated_accounts_csv =
-    update_user_tasks accounts_csv patient (string_of_int new_id)
-  in
-  let updated_accounts_csv =
-    update_user_tasks _updated_accounts_csv doctor (string_of_int new_id)
-  in
-
-  (* Save the updated accounts CSV *)
-  Csv.save accounts_path updated_accounts_csv;
+  accounts_csv_ref := update_user_tasks !accounts_csv_ref patient new_id;
+  accounts_csv_ref := update_user_tasks !accounts_csv_ref doctor new_id;
 
   Printf.printf "Record added: [%s]\n" (String.concat ", " new_record)
