@@ -98,7 +98,7 @@ let vote_on_task_driver accounts_csv_ref tasks_csv_ref user =
     Printf.printf "There are no tasks available for voting.\n"
   else (
     Printf.printf "\nThese are the tasks you can vote on:\n";
-    Task.display_tasks_from_ids !tasks_csv_ref votable_task_ids;
+    Task.display_tasks_without_votes !tasks_csv_ref votable_task_ids;
 
     (* Ask for Task ID *)
     Printf.printf
