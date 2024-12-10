@@ -5,7 +5,7 @@ module Account = Prescription_validator.Account
 module Pharmacist = Prescription_validator.Pharmacist
 module Doctor = Prescription_validator.Doctor
 module Patient = Prescription_validator.Patient
-module Task = Prescription_validator.Task.Task
+module Task = Prescription_validator.Task
 
 (* =========================== DRIVER PROGRAM =========================== *)
 (* Prescription Validator Program *)
