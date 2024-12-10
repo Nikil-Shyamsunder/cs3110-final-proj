@@ -68,7 +68,6 @@ let patient_driver username pwd role lst =
   let usr = Patient.create_user username pwd role lst in
   Patient.display_prescription_statuses tasks_csv usr
 
-(* Placeholder function for doctor loop *)
 let doctor_driver username pwd role lst =
   let usr = Doctor.create_user username pwd role in
   print_endline
@@ -85,10 +84,55 @@ let doctor_driver username pwd role lst =
   Doctor.add_diagnosis_prescription tasks_csv accounts_csv username patient
     diagnosis prescription
 
+(* Placeholder function for doctor loop *)
+let vote_on_task_driver accounts_csv_ref tasks_csv_ref user =
+  (* Fetch all tasks *)
+  let all_task_ids = Pharmacist.get_all_task_ids tasks_csv_ref in
+  let user_task_ids = Pharmacist.tasks user in
+  let votable_task_ids =
+    List.filter (fun id -> not (List.mem id user_task_ids)) all_task_ids
+  in
+
+  (* Display votable tasks *)
+  if votable_task_ids = [] then
+    Printf.printf "There are no tasks available for voting.\n"
+  else (
+    Printf.printf "\nThese are the tasks you can vote on:\n";
+    Task.display_tasks_from_ids !tasks_csv_ref votable_task_ids;
+
+    (* Ask for Task ID *)
+    Printf.printf
+      "\n\
+       Enter the Task ID you would like to vote on (or type 'quit' to \
+       abstain): ";
+    let input = read_line () in
+    if String.trim input = "quit" then
+      Printf.printf "You chose to abstain from voting. Goodbye!\n"
+    else
+      try
+        let task_id = int_of_string input in
+        match Pharmacist.find_task_row tasks_csv_ref task_id with
+        | None -> Printf.printf "Invalid Task ID. Exiting.\n"
+        | Some _ ->
+            Printf.printf "\nYou selected Task ID %d.\n" task_id;
+
+            (* Prompt for vote *)
+            Printf.printf "\nHow would you like to vote? (yes/no): ";
+            let vote = read_line () in
+
+            if vote = "yes" || vote = "no" then (
+              (* Process the vote *)
+              Pharmacist.vote_on_task_core accounts_csv_ref tasks_csv_ref user
+                task_id vote;
+              Printf.printf "Thank you for voting. Goodbye!\n")
+            else Printf.printf "Invalid vote. Exiting without voting.\n"
+      with Failure _ ->
+        Printf.printf "Invalid input. Exiting without voting.\n")
+
 (* Placeholder function for pharmacist tasks *)
 let pharmacist_driver username pwd role lst =
   let usr = Pharmacist.create_user username pwd role lst in
-  Pharmacist.vote_on_task accounts_csv tasks_csv usr
+  vote_on_task_driver accounts_csv tasks_csv usr
 ;;
 
 (* Entrypoint *)
