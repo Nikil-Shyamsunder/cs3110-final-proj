@@ -13,6 +13,7 @@ module Task = Prescription_validator.Task
 (* Set file paths *)
 let accounts_path = "data/accounts.csv"
 let tasks_path = "data/tasks.csv"
+let tasks = Task.load_tasks_from_csv tasks_path
 
 (* Welcome message *)
 let welcome_message () =
@@ -77,7 +78,7 @@ let doctor_driver username pwd role =
   let diagnosis = read_line () in
   print_endline "Enter prescription:";
   let prescription = read_line () in
-  print_endline "Diagnosis and prescription recorded."
+  Doctor.add_diagnosis_prescription tasks_path diagnosis prescription
 
 (* Placeholder function for pharmacist tasks *)
 let pharmacist_driver username pwd role =
@@ -85,8 +86,7 @@ let pharmacist_driver username pwd role =
   print_endline ("Pharmacist " ^ username ^ ", here are your tasks:");
   print_endline "(1) Verify Prescription: Amoxicillin for strep";
   print_endline "(2) Verify prescription: Trimethoprim for UTI: "
-
-let tasks = Task.load_tasks_from_csv tasks_path;;
+;;
 
 (* Entrypoint *)
 welcome_message ();
