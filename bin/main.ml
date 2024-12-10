@@ -1,11 +1,10 @@
 [@@@warning "-a"]
 
-open Prescription_validator.Accounts
-module Auth = Prescription_validator.Accounts.Authenticator
-module Account = Prescription_validator.Accounts.Account
-module Pharmacist = Prescription_validator.Accounts.Pharmacist
-module Doctor = Prescription_validator.Accounts.Doctor
-module Patient = Prescription_validator.Accounts.Patient
+module Auth = Prescription_validator.Authenticator
+module Account = Prescription_validator.Account
+module Pharmacist = Prescription_validator.Pharmacist
+module Doctor = Prescription_validator.Doctor
+module Patient = Prescription_validator.Patient
 module Task = Prescription_validator.Task.Task
 
 (* =========================== DRIVER PROGRAM =========================== *)
