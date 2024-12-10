@@ -64,11 +64,7 @@ let signup () =
 (* Placeholder function for patient loop *)
 let patient_driver username pwd role =
   let usr = Patient.create_user username pwd role in
-  print_endline
-    ("Welcome patient " ^ username
-   ^ ": Here are your outstanding prescriptions:");
-  print_endline "- Prescription 1: Tylenol for headaches: Approved!";
-  print_endline "- Prescription 2: Amoxicillin for strep: Pending approval..."
+  Patient.display_prescription_statuses accounts_path tasks_path username
 
 (* Placeholder function for doctor loop *)
 let doctor_driver username pwd role =
