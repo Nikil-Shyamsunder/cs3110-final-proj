@@ -13,4 +13,4 @@ val create_user : string -> string -> string -> int list -> t
 val role : t -> role
 (** [role acc] returns the role of the user [acc]. *)
 
-val display_prescription_statuses : Csv.t ref -> t -> unit
+val display_prescription_statuses : Csv.t ref -> t -> string

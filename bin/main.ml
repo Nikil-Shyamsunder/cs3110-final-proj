@@ -66,7 +66,8 @@ let signup () =
 (* Placeholder function for patient loop *)
 let patient_driver username pwd role lst =
   let usr = Patient.create_user username pwd role lst in
-  Patient.display_prescription_statuses tasks_csv usr
+  let output = Patient.display_prescription_statuses tasks_csv usr in
+  Printf.printf "%s" output
 
 let doctor_driver username pwd role lst =
   let usr = Doctor.create_user username pwd role in
