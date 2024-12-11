@@ -57,30 +57,36 @@ let display_tasks_from_ids (tasks_csv : Csv.t) task_ids =
       tasks_csv
   in
 
-  if task_ids = [] then Printf.printf "There are no tasks to display.\n"
-  else (
-    (* Print a header with fixed-width columns *)
-    Printf.printf "%-8s | %-15s | %-15s | %-8s | %-8s\n" "Task ID" "Diagnosis"
-      "Prescription" "Yes Vote" "No Vote";
-    Printf.printf
-      "--------------------------------------------------------------\n";
+  if task_ids = [] then "There are no tasks to display.\n"
+  else
+    let header =
+      Printf.sprintf "%-8s | %-15s | %-15s | %-8s | %-8s\n" "Task ID"
+        "Diagnosis" "Prescription" "Yes Vote" "No Vote"
+      ^ Printf.sprintf
+          "--------------------------------------------------------------\n"
+    in
 
-    (* For each task ID, find and print the corresponding task *)
-    List.iter
-      (fun task_id ->
-        match find_task tasks_csv task_id with
-        | None -> Printf.printf "Task with ID %d not found in tasks.\n" task_id
-        | Some task_row ->
-            (* Extract the desired columns: Task ID, Diagnosis, Prescription,
-               Yes Vote, No Vote *)
-            let task_id = List.nth task_row 0 in
-            let diagnosis = List.nth task_row 1 in
-            let prescription = List.nth task_row 2 in
-            let yes_vote = List.nth task_row 3 in
-            let no_vote = List.nth task_row 5 in
-            Printf.printf "%-8s | %-15s | %-15s | %-8s | %-8s\n" task_id
-              diagnosis prescription yes_vote no_vote)
-      task_ids)
+    let task_rows =
+      List.fold_left
+        (fun acc task_id ->
+          match find_task tasks_csv task_id with
+          | None ->
+              acc
+              ^ Printf.sprintf "Task with ID %d not found in tasks.\n" task_id
+          | Some task_row ->
+              (* Extract the desired columns: Task ID, Diagnosis, Prescription,
+                 Yes Vote, No Vote *)
+              let task_id = List.nth task_row 0 in
+              let diagnosis = List.nth task_row 1 in
+              let prescription = List.nth task_row 2 in
+              let yes_vote = List.nth task_row 3 in
+              let no_vote = List.nth task_row 5 in
+              acc
+              ^ Printf.sprintf "%-8s | %-15s | %-15s | %-8s | %-8s\n" task_id
+                  diagnosis prescription yes_vote no_vote)
+        "" task_ids
+    in
+    header ^ task_rows
 
 let display_tasks_without_votes (tasks_csv : Csv.t) task_ids =
   (* Helper function to find a task by task ID in the tasks CSV *)
