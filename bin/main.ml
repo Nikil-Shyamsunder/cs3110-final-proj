@@ -15,7 +15,6 @@ module Blockchain = Prescription_validator.Blockchain
 let accounts_path = "data/accounts.csv"
 let tasks_path = "data/tasks.csv"
 let accounts_csv = ref (Csv.load accounts_path)
-let tasks = Task.load_tasks_from_csv tasks_path
 let blockchain = Blockchain.load_blockchain_from_file "data/blockchain.json"
 
 let () =

@@ -1,50 +1,8 @@
-type voteTally = {
-  yes_votes : int;
-  yes_voters : string list;
-  no_votes : int;
-  no_voters : string list;
-}
-
-type t = {
-  task_id : int;
-  diagnosis : string;
-  prescription : string;
-  vote_count : voteTally;
-}
+type t = Csv.t
 
 (** Helper to parse voter IDs from a string *)
 let parse_voter_ids voter_ids_str =
   String.split_on_char ',' voter_ids_str |> List.map String.trim
-
-(** [parse_task row] parses a row from CSV into a Task.t *)
-let parse_task row =
-  match row with
-  | [
-   task_id;
-   diagnosis;
-   prescription;
-   yes_votes;
-   yes_voters_str;
-   no_votes;
-   no_voters_str;
-  ] ->
-      let yes_voters = parse_voter_ids yes_voters_str in
-      let no_voters = parse_voter_ids no_voters_str in
-      let vote_count =
-        {
-          yes_votes = int_of_string yes_votes;
-          yes_voters;
-          no_votes = int_of_string no_votes;
-          no_voters;
-        }
-      in
-      { task_id = int_of_string task_id; diagnosis; prescription; vote_count }
-  | _ -> failwith "Incorrect CSV format for task"
-
-(** [load_tasks_from_csv filepath] loads tasks from a CSV file *)
-let load_tasks_from_csv filepath =
-  let csv_data = Csv.load filepath in
-  List.map parse_task csv_data
 
 let display_tasks_from_ids (tasks_csv : Csv.t) task_ids =
   (* Helper function to find a task by task ID in the tasks CSV *)
