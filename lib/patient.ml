@@ -5,7 +5,6 @@ open Csv
     csv file of accounts. *)
 let display_prescription_statuses tasks_csv user =
   (* Check if the user's task list is empty and return a string *)
-
   match tasks user with
   | [] ->
       Printf.sprintf

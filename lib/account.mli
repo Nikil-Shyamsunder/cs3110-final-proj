@@ -14,3 +14,4 @@ val username : t -> string
 val tasks : t -> int list
 val find_user : string -> string -> string list option
 val get_user_task_list : string -> string -> int list option
+val update_user_tasks : Csv.t ref -> string -> int -> unit
