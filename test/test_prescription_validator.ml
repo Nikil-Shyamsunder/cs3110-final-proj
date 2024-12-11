@@ -6,8 +6,11 @@ open Prescription_validator.Doctor
 open Prescription_validator.Patient
 open Prescription_validator.Pharmacist
 open Prescription_validator.Task
+open Prescription_validator.Block
+open Prescription_validator.Blockchain
 open Prescription_validator
 
+(* ======================= TEST ACCOUNT ======================= *)
 let create_doctor _ =
   let doctor = Doctor.create_user "Dr. xyz" "password123" "doctor" [] in
   assert_equal "doctor" (Doctor.role doctor);
@@ -89,6 +92,7 @@ let test_get_user_task_list _ =
 
   Sys.remove temp_file_normal
 
+(* ======================= TEST DOCTOR ======================= *)
 let test_add_diagnosis_prescription _ =
   let tasks_csv_ref =
     ref
@@ -124,6 +128,7 @@ let test_add_diagnosis_prescription _ =
   assert_equal expected_accounts_csv !accounts_csv_ref
     ~msg:"accounts\n\n   CSV not updated correctly"
 
+(* ======================= TEST PHARMACIST ======================= *)
 let test_get_all_task_ids _ =
   let temp_file = Filename.temp_file "tasks" ".csv" in
   let csv_data =
@@ -265,6 +270,94 @@ let test_vote_on_task_core _ =
   Printf.printf "testing";
   Sys.remove temp_file_accounts
 
+(* ======================= TEST BLOCK ======================= *)
+(* Test case for hashing a string *)
+let test_hash _ =
+  let data = "hello world" in
+  let hashed = hash data in
+  assert_bool "Hash should not be empty" (String.length hashed > 0);
+  assert_bool "Hash should match expected length" (String.length hashed = 32)
+
+(* Test case for converting CSV to string *)
+let test_csv_to_string _ =
+  let csv = [ [ "1"; "Task A" ]; [ "2"; "Task B" ] ] in
+  let result = csv_to_string csv in
+  let expected = "1,Task A\n2,Task B" in
+  assert_equal expected result ~msg:"CSV string representation mismatch"
+
+(* Test case for mining a block *)
+let test_mine_block _ =
+  let index = 1 in
+  let timestamp = string_of_float (Unix.gettimeofday ()) in
+  let tasks_csv = [ [ "1"; "Task A" ]; [ "2"; "Task B" ] ] in
+  let previous_hash = "0" in
+  let difficulty = 5 in
+  let block = mine_block index timestamp tasks_csv previous_hash difficulty in
+  assert_equal block.index index ~msg:"Block index mismatch";
+  assert_equal block.previous_hash previous_hash ~msg:"Previous hash mismatch";
+  assert_bool "Hash should be valid based on difficulty"
+    (is_valid_hash block.hash difficulty);
+  assert_bool "Nonce should be >= 0" (block.nonce >= 0)
+
+(* Test case for block string conversion *)
+let test_block_to_string _ =
+  let index = 1 in
+  let timestamp = "1234567890.123" in
+  let tasks_csv = [ [ "1"; "Task A" ]; [ "2"; "Task B" ] ] in
+  let previous_hash = "abc123" in
+  let nonce = 42 in
+  let block =
+    { index; timestamp; tasks_csv; previous_hash; nonce; hash = "dummy_hash" }
+  in
+  let result = block_to_string block in
+  let expected = "1|1234567890.123|1,Task A\n2,Task B|abc123|42" in
+  assert_equal expected result ~msg:"Block string representation mismatch"
+
+(* ======================= TEST BLOCKCHAIN ======================= *)
+(* Test case for creating the genesis block *)
+let test_create_genesis_block _ =
+  let difficulty = 2 in
+  let genesis_block = create_genesis_block difficulty in
+  assert_equal genesis_block.index 0 ~msg:"Genesis block index mismatch";
+  assert_equal genesis_block.previous_hash "0"
+    ~msg:"Genesis block previous hash mismatch";
+  assert_bool "Genesis block hash should satisfy difficulty"
+    (is_valid_hash genesis_block.hash difficulty);
+  assert_equal genesis_block.tasks_csv [ [ "Genesis Block" ] ]
+    ~msg:"Genesis block tasks mismatch"
+
+(* Test case for creating a new block *)
+let test_create_block _ =
+  let difficulty = 2 in
+  let blockchain = [ create_genesis_block difficulty ] in
+  let tasks_csv = [ [ "1"; "Task A" ]; [ "2"; "Task B" ] ] in
+  let new_block = create_block blockchain tasks_csv difficulty in
+  assert_equal new_block.index 1 ~msg:"New block index mismatch";
+  assert_equal new_block.previous_hash (List.hd blockchain).hash
+    ~msg:"New block previous hash mismatch";
+  assert_bool "New block hash should satisfy difficulty"
+    (is_valid_hash new_block.hash difficulty);
+  assert_equal new_block.tasks_csv tasks_csv ~msg:"New block tasks mismatch"
+
+(* Test case for validating a blockchain *)
+let test_validate_blockchain _ =
+  let difficulty = 2 in
+  let genesis_block = create_genesis_block difficulty in
+  let blockchain = ref [ genesis_block ] in
+  let tasks_csv_1 = [ [ "1"; "Task A" ] ] in
+  let tasks_csv_2 = [ [ "2"; "Task B" ] ] in
+  let block1 = create_block !blockchain tasks_csv_1 difficulty in
+  blockchain := block1 :: !blockchain;
+  let block2 = create_block !blockchain tasks_csv_2 difficulty in
+  blockchain := block2 :: !blockchain;
+  assert_bool "Valid blockchain" (validate_blockchain !blockchain);
+
+  (* Tamper with a block *)
+  let tampered_block = { block1 with hash = "tampered_hash" } in
+  let tampered_blockchain = tampered_block :: List.tl !blockchain in
+  assert_bool "Invalid blockchain after tampering"
+    (not (validate_blockchain tampered_blockchain))
+
 let suite =
   "test suite"
   >::: [
@@ -278,6 +371,13 @@ let suite =
          "test_get_all_task_ids" >:: test_get_all_task_ids;
          "test_find_task_row" >:: test_find_task_row;
          "test_vote_on_task_core" >:: test_vote_on_task_core;
+         "test_hash" >:: test_hash;
+         "test_csv_to_string" >:: test_csv_to_string;
+         "test_mine_block" >:: test_mine_block;
+         "test_block_to_string" >:: test_block_to_string;
+         "test_create_genesis_block" >:: test_create_genesis_block;
+         "test_create_block" >:: test_create_block;
+         "test_validate_blockchain" >:: test_validate_blockchain;
        ]
 
 let () = run_test_tt_main suite
