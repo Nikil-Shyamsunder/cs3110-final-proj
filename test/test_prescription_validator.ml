@@ -77,7 +77,6 @@ let test_get_user_task_list _ =
   Sys.remove temp_file
 
 let test_add_diagnosis_prescription _ =
-  (* Mock tasks CSV *)
   let tasks_csv_ref =
     ref
       [
@@ -85,8 +84,6 @@ let test_add_diagnosis_prescription _ =
         [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "0"; "[]" ];
       ]
   in
-
-  (* Mock accounts CSV *)
   let accounts_csv_ref =
     ref
       [
@@ -94,12 +91,8 @@ let test_add_diagnosis_prescription _ =
         [ "patient1"; "password"; "patient"; "[1,2]" ];
       ]
   in
-
-  (* Add a new diagnosis and prescription *)
   add_diagnosis_prescription tasks_csv_ref accounts_csv_ref "doctor1" "patient1"
     "Diagnosis3" "Prescription3";
-
-  (* Check tasks CSV *)
   let expected_tasks_csv =
     [
       [ "1"; "Diagnosis1"; "Prescription1"; "0"; "[]"; "0"; "[]" ];
@@ -109,8 +102,6 @@ let test_add_diagnosis_prescription _ =
   in
   assert_equal expected_tasks_csv !tasks_csv_ref
     ~msg:"tasks CSV not updated correctly";
-
-  (* Check accounts CSV *)
   let expected_accounts_csv =
     [
       [ "doctor1"; "password"; "doctor"; "[3]" ];
@@ -119,6 +110,41 @@ let test_add_diagnosis_prescription _ =
   in
   assert_equal expected_accounts_csv !accounts_csv_ref
     ~msg:"accounts\n\n   CSV not updated correctly"
+
+let test_get_all_task_ids _ =
+  let temp_file = Filename.temp_file "tasks" ".csv" in
+  let csv_data =
+    [
+      [ "1"; "Diagnosis1"; "Prescription1"; "0"; "[]"; "0"; "[]" ];
+      [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "0"; "[]" ];
+      [ "3"; "Diagnosis3"; "Prescription3"; "0"; "[]"; "0"; "[]" ];
+    ]
+  in
+  Csv.save temp_file csv_data;
+  let tasks_csv_ref = ref (Csv.load temp_file) in
+  let task_ids = get_all_task_ids tasks_csv_ref in
+  assert_equal [ 3; 2; 1 ] task_ids ~msg:"Failed to get all task ids correctly.";
+  Sys.remove temp_file
+
+let test_find_task_row _ =
+  let temp_file = Filename.temp_file "tasks" ".csv" in
+  let csv_data =
+    [
+      [ "1"; "Diagnosis1"; "Prescription1"; "0"; "[]"; "0"; "[]" ];
+      [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "0"; "[]" ];
+      [ "3"; "Diagnosis3"; "Prescription3"; "0"; "[]"; "0"; "[]" ];
+    ]
+  in
+  Csv.save temp_file csv_data;
+  let tasks_csv_ref = ref (Csv.load temp_file) in
+  let task_row = find_task_row tasks_csv_ref 2 in
+  assert_equal
+    (Some [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "0"; "[]" ])
+    task_row ~msg:"Failed to find the correct task row.";
+  let non_existent_task_row = find_task_row tasks_csv_ref 4 in
+  assert_equal None non_existent_task_row
+    ~msg:"Non-existent task should not be found.";
+  Sys.remove temp_file
 
 let suite =
   "test suite"
@@ -129,6 +155,8 @@ let suite =
          "test_find_user" >:: test_find_user;
          "test_get_user_task_list" >:: test_get_user_task_list;
          "test_add_diagnosis_prescription" >:: test_add_diagnosis_prescription;
+         "test_get_all_task_ids" >:: test_get_all_task_ids;
+         "test_find_task_row" >:: test_find_task_row;
        ]
 
 let () = run_test_tt_main suite
