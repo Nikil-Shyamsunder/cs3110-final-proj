@@ -6,6 +6,7 @@ module Pharmacist = Prescription_validator.Pharmacist
 module Doctor = Prescription_validator.Doctor
 module Patient = Prescription_validator.Patient
 module Task = Prescription_validator.Task
+module Block = Prescription_validator.Block
 
 (* =========================== DRIVER PROGRAM =========================== *)
 (* Prescription Validator Program *)
@@ -16,6 +17,7 @@ let tasks_path = "data/tasks.csv"
 let accounts_csv = ref (Csv.load accounts_path)
 let tasks_csv = ref (Csv.load tasks_path)
 let tasks = Task.load_tasks_from_csv tasks_path
+let blockchain = ref []
 
 (* Welcome message *)
 let welcome_message () =
@@ -81,7 +83,6 @@ let doctor_driver username pwd role lst =
   let diagnosis = read_line () in
   print_endline "Enter prescription:";
   let prescription = read_line () in
-
   Doctor.add_diagnosis_prescription tasks_csv accounts_csv username patient
     diagnosis prescription
 

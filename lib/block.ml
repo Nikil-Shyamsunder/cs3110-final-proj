@@ -5,7 +5,6 @@ open Csv
 type block = {
   index : int;
   timestamp : string;
-  accounts_csv : Csv.t;
   tasks_csv : Csv.t;
   previous_hash : string;
   hash : string;
@@ -24,21 +23,25 @@ let hash data = Digest.(to_hex (string data))
 let csv_to_string csv =
   csv |> List.map (fun row -> String.concat "," row) |> String.concat "\n"
 
-let create_block index accounts_csv (tasks_csv : Csv.t) previous_hash =
+let create_block (blockchain : 'a ref) (tasks_csv : Csv.t) =
+  let new_index = TaskCounter.next () in
   let timestamp = string_of_float (Sys.time ()) in
-
+  let previous_hash =
+    match !blockchain with
+    | [] -> string_of_int 0
+    | last_block :: _ -> last_block.hash
+  in
   let block_data =
-    Printf.sprintf "%d|%s|%s|%s|%s" index timestamp
-      (csv_to_string accounts_csv)
-      (csv_to_string tasks_csv) previous_hash
+    Printf.sprintf "%d|%s|%s|%s" new_index timestamp (csv_to_string tasks_csv)
+      previous_hash
   in
   let hash_code = hash block_data in
-  (* let new_id = get_last_task_id tasks_csv in *)
-  {
-    index = new_id;
-    timestamp;
-    accounts_csv;
-    tasks_csv;
-    previous_hash;
-    hash = hash_code;
-  }
+  { index = new_index; timestamp; tasks_csv; previous_hash; hash = hash_code }
+
+let validate_blockchain blockchain =
+  let rec validate_chain = function
+    | [] | [ _ ] -> true (* A single block or empty chain is valid *)
+    | b1 :: (b2 :: _ as rest) ->
+        b2.previous_hash = b1.hash && validate_chain rest
+  in
+  validate_chain blockchain
