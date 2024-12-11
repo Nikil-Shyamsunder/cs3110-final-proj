@@ -1,3 +1,5 @@
 (library
  (name prescription_validator)
- (libraries unix csv digestif))
+ (libraries csv)
+ (instrumentation
+  (backend bisect_ppx)))
