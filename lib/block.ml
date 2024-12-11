@@ -1,15 +1,10 @@
+
 open Digest
 open Sys
 open Csv
 
-type block = {
-  index : int;
-  timestamp : string;
-  accounts_csv : Csv.t;
-  tasks_csv : Csv.t;
-  previous_hash : string;
-  hash : string;
-}
+   type block = { index : int; timestamp : string; accounts_csv : Csv.t;
+   tasks_csv : Csv.t; previous_hash : string; hash : string; }
 
 module TaskCounter = struct
   let counter = ref 0

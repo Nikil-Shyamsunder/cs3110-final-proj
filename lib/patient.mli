@@ -1,6 +1,3 @@
-type role
-(** Type representing user roles *)
-
 type t
 (** Type representing a user *)
 
@@ -10,7 +7,8 @@ val create_user : string -> string -> string -> int list -> t
     initialized as an empty list. Raises: [Failure "input invalid"] if [role_op]
     is not a valid role string. *)
 
-val role : t -> role
+val role : t -> string
 (** [role acc] returns the role of the user [acc]. *)
-
-val display_prescription_statuses : Csv.t ref -> t -> string
+val username : t -> string
+val tasks : t -> int list
+val display_prescription_statuses : Csv.t ref -> t -> unit
