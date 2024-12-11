@@ -146,6 +146,63 @@ let test_find_task_row _ =
     ~msg:"Non-existent task should not be found.";
   Sys.remove temp_file
 
+let test_vote_on_task_core _ =
+  let temp_file_tasks = Filename.temp_file "tasks" ".csv" in
+  let temp_file_accounts = Filename.temp_file "accounts" ".csv" in
+
+  let tasks_csv_data =
+    [
+      [ "1"; "Diagnosis1"; "Prescription1"; "0"; "[]"; "0"; "[]" ];
+      [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "0"; "[]" ];
+    ]
+  in
+  let accounts_csv_data =
+    [
+      [ "alice"; "password1"; "doctor"; "[1,2]" ];
+      [ "bob"; "password2"; "patient"; "[3,4]" ];
+    ]
+  in
+
+  Csv.save temp_file_tasks tasks_csv_data;
+  Csv.save temp_file_accounts accounts_csv_data;
+
+  let tasks_csv = ref (Csv.load temp_file_tasks) in
+  let accounts_csv = ref (Csv.load temp_file_accounts) in
+
+  let user = Pharmacist.create_user "alice" "password1" "doctor" [ 1; 2 ] in
+
+  vote_on_task_core accounts_csv tasks_csv user 1 "yes";
+
+  let updated_task_row =
+    List.hd (List.filter (fun row -> List.hd row = "1") !tasks_csv)
+  in
+  assert_equal
+    [ "1"; "Diagnosis1"; "Prescription1"; "1"; "[alice]"; "0"; "[]" ]
+    updated_task_row;
+
+  let updated_user_row =
+    List.hd (List.filter (fun row -> List.hd row = "alice") !accounts_csv)
+  in
+  assert_equal [ "alice"; "password1"; "doctor"; "[1,1,2]" ] updated_user_row;
+
+  vote_on_task_core accounts_csv tasks_csv user 1 "no";
+
+  let updated_task_row_no =
+    List.hd (List.filter (fun row -> List.hd row = "1") !tasks_csv)
+  in
+  assert_equal
+    [ "1"; "Diagnosis1"; "Prescription1"; "1"; "[alice]"; "1"; "[alice]" ]
+    updated_task_row_no;
+
+  let updated_user_row_no =
+    List.hd (List.filter (fun row -> List.hd row = "alice") !accounts_csv)
+  in
+  assert_equal [ "alice"; "password1"; "doctor"; "[1,1,2]" ] updated_user_row_no;
+
+  Sys.remove temp_file_tasks;
+  Printf.printf "testing";
+  Sys.remove temp_file_accounts
+
 let suite =
   "test suite"
   >::: [
@@ -157,6 +214,7 @@ let suite =
          "test_add_diagnosis_prescription" >:: test_add_diagnosis_prescription;
          "test_get_all_task_ids" >:: test_get_all_task_ids;
          "test_find_task_row" >:: test_find_task_row;
+         "test_vote_on_task_core" >:: test_vote_on_task_core;
        ]
 
 let () = run_test_tt_main suite
