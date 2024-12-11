@@ -22,6 +22,4 @@ let add_diagnosis_prescription (tasks_csv_ref : Csv.t ref)
 
   (* Update the tasks column for the patient and doctor *)
   update_user_tasks accounts_csv_ref patient new_id;
-  update_user_tasks accounts_csv_ref doctor new_id;
-
-  Printf.printf "Record added: [%s]\n" (String.concat ", " new_record)
+  update_user_tasks accounts_csv_ref doctor new_id

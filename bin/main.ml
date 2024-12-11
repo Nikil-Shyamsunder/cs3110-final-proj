@@ -111,7 +111,8 @@ let vote_on_task_driver accounts_csv_ref tasks_csv_ref user =
     Printf.printf "There are no tasks available for voting.\n"
   else (
     Printf.printf "\nThese are the tasks you can vote on:\n";
-    Task.display_tasks_without_votes !tasks_csv_ref votable_task_ids;
+    Printf.printf "%s"
+      (Task.display_tasks_without_votes !tasks_csv_ref votable_task_ids);
 
     (* Ask for Task ID *)
     Printf.printf
@@ -137,6 +138,9 @@ let vote_on_task_driver accounts_csv_ref tasks_csv_ref user =
               (* Process the vote *)
               Pharmacist.vote_on_task_core accounts_csv_ref tasks_csv_ref user
                 task_id vote;
+              Printf.printf
+                "Your vote has been recorded, and the task has been added to \
+                 your tasks.\n";
               Printf.printf "Thank you for voting. Goodbye!\n")
             else Printf.printf "Invalid vote. Exiting without voting.\n"
       with Failure _ ->
