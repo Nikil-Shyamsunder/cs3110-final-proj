@@ -12,5 +12,19 @@ val create_block : t -> Csv.t -> int -> Block.t
 val validate_blockchain : t -> bool
 (** Validates the integrity of the blockchain *)
 
+val blockchain_to_json :
+  Block.t list ->
+  [> `List of
+     [> `Assoc of
+        (string
+        * [> `Int of int
+          | `List of [> `List of [> `String of string ] list ] list
+          | `String of string
+          ])
+        list
+     ]
+     list
+  ]
+
 val save_blockchain_to_file : t -> string -> unit
 val load_blockchain_from_file : string -> t
