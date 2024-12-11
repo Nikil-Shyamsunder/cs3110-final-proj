@@ -1,0 +1,29 @@
+---
+# Members of your group.
+group:
+  - name: Hrishabh Ayush
+    netid: ha385
+  - name: Nikil Shyamsunder
+    netid: nvs26
+  - name: Pradhi Pakkrakari
+    netid: sp2362
+# Your PM.
+pm:
+  name: Anya Yerramilli
+  netid: ay326
+publish: false
+title: "The Complete Caml Calculator (CCC)"
+# OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
+git-repo: "https://github.com/Nikil-Shyamsunder/cs3110-final-proj"
+# Replace the URL with your own demo video.
+demo-video-url: https://youtu.be/A0Q7PPWo2AQ
+# Write a short, attention-grabbing description of your project.
+desc: >
+  Our project is a blockchain application . It supports standard mathematical
+  operations like addition, multiplication, negation, and division on both
+  integers and floating-point numbers. The interface is completely
+  programmable--new functions can easily be defined and assigned to new "keys"
+  in the visual interface.
+
+  Standard visual I/O is supported, but the calculator can also emit sound. By
+  pressing down a special key, it can play a fugue by J.S. Bach.
