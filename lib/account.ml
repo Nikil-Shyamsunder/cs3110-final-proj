@@ -10,11 +10,6 @@ type t = {
   task_list : int list;
 }
 
-let role_display = function
-  | Doctor -> "Doctor"
-  | Pharmacist -> "Pharmacist"
-  | Patient -> "Patient"
-
 let role_to_string = function
   | Patient -> "patient"
   | Doctor -> "doctor"
@@ -29,7 +24,7 @@ let string_to_role = function
 let create_user (u : string) (p : string) (role_op : string) (lst : int list) =
   { username = u; password = p; role = string_to_role role_op; task_list = lst }
 
-let role acc = acc.role
+let role acc = role_to_string acc.role
 let username acc = acc.username
 let tasks acc = acc.task_list
 
