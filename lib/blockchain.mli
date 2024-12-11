@@ -26,5 +26,6 @@ val blockchain_to_json :
      list
   ]
 
+val blockchain_of_json : Yojson.Basic.t -> Block.t list
 val save_blockchain_to_file : t -> string -> unit
 val load_blockchain_from_file : string -> t

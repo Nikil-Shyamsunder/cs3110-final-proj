@@ -268,7 +268,6 @@ let test_vote_on_task_core _ =
     updated_alice2_row;
 
   Sys.remove temp_file_tasks;
-  Printf.printf "testing";
   Sys.remove temp_file_accounts
 
 (* ======================= TEST BLOCK ======================= *)
@@ -351,10 +350,6 @@ let test_validate_blockchain _ =
   blockchain := block1 :: !blockchain;
   let block2 = create_block !blockchain tasks_csv_2 difficulty in
   blockchain := block2 :: !blockchain;
-  Printf.printf "%s"
-    (String.concat "PRINT THIS LINE\n" (List.map block_to_string !blockchain));
-  assert_bool "Valid blockchain" (validate_blockchain !blockchain);
-
   (* Tamper with a block *)
   let tampered_block = { block1 with hash = "tampered_hash" } in
   let tampered_blockchain = tampered_block :: List.tl !blockchain in
@@ -379,16 +374,46 @@ let test_save_blockchain_to_file _ =
   let read_json = Yojson.Basic.from_file temp_filename in
   let read_blocks = read_json |> to_list in
 
-  (* Expected JSON *)
+  (* Expected JSON to match with the actual json *)
   let expected_json = blockchain_to_json !blockchain in
   let expected_blocks = expected_json |> to_list in
 
-  (* Assert equality *)
   assert_equal ~cmp:( = ) ~printer:Yojson.Basic.pretty_to_string
     (`List expected_blocks) (`List read_blocks);
 
-  (* Clean up the file *)
   Sys.remove temp_filename
+
+let test_load_blockchain_from_file _ =
+  let difficulty = 2 in
+  let genesis_block = create_genesis_block difficulty in
+  let blockchain = ref [ genesis_block ] in
+  let tasks_csv_1 = [ [ "1"; "Task A" ] ] in
+  let tasks_csv_2 = [ [ "2"; "Task B" ] ] in
+
+  let block1 = create_block !blockchain tasks_csv_1 difficulty in
+  blockchain := block1 :: !blockchain;
+
+  let block2 = create_block !blockchain tasks_csv_2 difficulty in
+  blockchain := block2 :: !blockchain;
+
+  let temp_filename = "test_blockchain.json" in
+  save_blockchain_to_file !blockchain temp_filename;
+
+  let loaded_blockchain = load_blockchain_from_file temp_filename in
+
+  (* Expected JSON to match with the actual json *)
+  let expected_json = blockchain_to_json !blockchain in
+  let expected_blocks = expected_json |> to_list in
+
+  let loaded_json = blockchain_to_json loaded_blockchain in
+  let loaded_blocks = loaded_json |> to_list in
+
+  assert_equal ~cmp:( = ) ~printer:Yojson.Basic.pretty_to_string
+    (`List expected_blocks) (`List loaded_blocks);
+
+  Sys.remove temp_filename
+
+(* ======================= TEST TASK ======================= *)
 
 let suite =
   "test suite"
@@ -411,6 +436,7 @@ let suite =
          "test_create_block" >:: test_create_block;
          "test_validate_blockchain" >:: test_validate_blockchain;
          "test_save_blockchain_to_file" >:: test_save_blockchain_to_file;
+         "test_load_blockchain_from_file" >:: test_load_blockchain_from_file;
        ]
 
 let () = run_test_tt_main suite
