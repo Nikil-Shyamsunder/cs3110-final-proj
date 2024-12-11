@@ -167,4 +167,6 @@ match read_int_opt () with
 ;;
 
 Csv.save accounts_path !accounts_csv;
-Csv.save tasks_path !tasks_csv
+let new_block = Blockchain.create_block blockchain !tasks_csv 2 in
+let blockchain = new_block :: blockchain in
+Blockchain.save_blockchain_to_file blockchain "data/blockchain.json"
