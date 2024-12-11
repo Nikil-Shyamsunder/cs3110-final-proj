@@ -1,6 +1,6 @@
 include Account
 
-(* Helper to get all task IDs from tasks CSV *)
+(** [get_all_task_ids tasks_csv] gets the task IDs from tasks CSV *)
 let get_all_task_ids (tasks_csv : Csv.t ref) =
   List.fold_left
     (fun acc row ->
@@ -9,7 +9,8 @@ let get_all_task_ids (tasks_csv : Csv.t ref) =
       | _ -> acc)
     [] !tasks_csv
 
-(* Helper to find a task row by task ID *)
+(** [find_task_row tasks_csv] finds a task row in the csv file of the available
+    tasks by task ID *)
 let find_task_row (tasks_csv : Csv.t ref) task_id =
   List.find_opt (fun row -> List.hd row = string_of_int task_id) !tasks_csv
 
@@ -60,25 +61,11 @@ let update_task_csv (tasks_csv : Csv.t ref) task_id username vote =
         else row)
       !tasks_csv
 
-(* Helper to update a user's task list in accounts CSV *)
-let update_user_tasks (accounts_csv : Csv.t ref) user task_id =
-  accounts_csv :=
-    List.map
-      (fun row ->
-        match row with
-        | [ u; pw; role; task_list ] when u = username user ->
-            let updated_task_list =
-              task_id :: tasks user |> List.map string_of_int
-              |> String.concat "," |> Printf.sprintf "[%s]"
-            in
-            [ u; pw; role; updated_task_list ]
-        | _ -> row)
-      !accounts_csv
-
-(* Core function to process a vote *)
+(** [vote_on_task_core accounts_csv tasks_csv user task_id vote] records a vote
+    on a task and updates the user's task list. *)
 let vote_on_task_core (accounts_csv : Csv.t ref) (tasks_csv : Csv.t ref)
     (user : t) task_id vote =
   update_task_csv tasks_csv task_id (username user) vote;
-  update_user_tasks accounts_csv user task_id;
+  update_user_tasks accounts_csv (username user) task_id;
   Printf.printf
     "Your vote has been recorded, and the task has been added to your tasks.\n"
