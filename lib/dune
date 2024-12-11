@@ -1,5 +1,5 @@
 (library
  (name prescription_validator)
- (libraries csv)
+ (libraries csv yojson)
  (instrumentation
   (backend bisect_ppx)))

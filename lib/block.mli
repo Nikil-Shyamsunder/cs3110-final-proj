@@ -1,20 +1,22 @@
-type block = {
+type t = {
   index : int;
   timestamp : string;
   tasks_csv : Csv.t;
   previous_hash : string;
+  nonce : int;
   hash : string;
 }
 
-module TaskCounter : sig
-  val next : unit -> int
-end
-
-(* A Hash Function that gives a hash-id for a block*)
 val hash : string -> string
+(** Hashes a string using Digest *)
 
-(*Creates and returns a new block that gets appended to the blockchain*)
-val create_block : block list ref -> Csv.t -> block
+val block_to_string : t -> string
+(** Converts a block to a string for hashing *)
 
-(*Validate Blockchain*)
-val validate_blockchain : block list -> bool
+val is_valid_hash : string -> int -> bool
+(** Checks if a hash is valid for a given difficulty *)
+
+val mine_block : int -> string -> Csv.t -> string -> int -> t
+(** Mines a new block with the given parameters and difficulty *)
+
+val csv_to_string : Csv.t -> string
