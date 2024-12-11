@@ -401,6 +401,7 @@ let test_load_blockchain_from_file _ =
 
   let loaded_blockchain = load_blockchain_from_file temp_filename in
 
+  (* Expected JSON to match with the actual json *)
   let expected_json = blockchain_to_json !blockchain in
   let expected_blocks = expected_json |> to_list in
 
@@ -411,6 +412,8 @@ let test_load_blockchain_from_file _ =
     (`List expected_blocks) (`List loaded_blocks);
 
   Sys.remove temp_filename
+
+(* ======================= TEST TASK ======================= *)
 
 let suite =
   "test suite"
