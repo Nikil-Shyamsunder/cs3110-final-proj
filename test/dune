@@ -1,2 +1,5 @@
 (test
- (name test_prescription_validator))
+ (name test_prescription_validator)
+ (libraries ounit2 prescription_validator)
+ (deps (glob_files_rec ../data/*))
+)
