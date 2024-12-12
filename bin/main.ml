@@ -9,7 +9,6 @@ module Task = Prescription_validator.Task
 module Blockchain = Prescription_validator.Blockchain
 
 (* =========================== DRIVER PROGRAM =========================== *)
-(* Prescription Validator Program *)
 
 (* Set file paths *)
 let accounts_path = "data/accounts.csv"
@@ -69,12 +68,13 @@ let signup () =
   (* Assuming a signup function is available *)
   create_account username password role
 
-(* Placeholder function for patient loop *)
+(* Function to print out a patient's relevant tasks *)
 let patient_driver username pwd role lst =
   let usr = Patient.create_user username pwd role lst in
   let output = Patient.display_prescription_statuses tasks_csv usr in
   Printf.printf "%s" output
 
+(* Function to ask a doctor to add a new task to the blockchain *)
 let doctor_driver username pwd role lst =
   let usr = Doctor.create_user username pwd role in
   print_endline
@@ -90,7 +90,7 @@ let doctor_driver username pwd role lst =
   Doctor.add_diagnosis_prescription tasks_csv accounts_csv username patient
     diagnosis prescription
 
-(* Placeholder function for doctor loop *)
+(* Helper function for pharmacists to vote on tasks *)
 let vote_on_task_driver accounts_csv_ref tasks_csv_ref user =
   (* Fetch all tasks *)
   let all_task_ids = Pharmacist.get_all_task_ids tasks_csv_ref in
@@ -139,7 +139,7 @@ let vote_on_task_driver accounts_csv_ref tasks_csv_ref user =
       with Failure _ ->
         Printf.printf "Invalid input. Exiting without voting.\n")
 
-(* Placeholder function for pharmacist tasks *)
+(* Driver function for pharmacists to vote on tasks *)
 let pharmacist_driver username pwd role lst =
   let usr = Pharmacist.create_user username pwd role lst in
   vote_on_task_driver accounts_csv tasks_csv usr
