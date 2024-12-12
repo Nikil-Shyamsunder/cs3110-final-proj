@@ -1,9 +1,8 @@
-type t
-type voteTally
 
-val load_tasks_from_csv : string -> t list
-val display_tasks_from_ids : Csv.t -> int list -> string
-val display_tasks_without_votes : Csv.t -> int list -> string
+type t = Csv.t
+
+val display_tasks_from_ids : t -> int list -> string
+val display_tasks_without_votes : t -> int list -> string
 val string_to_task_ids : string -> int list
 val task_id : t -> int
 val diagnosis : t -> string
