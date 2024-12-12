@@ -5,7 +5,7 @@ group:
     netid: ha385
   - name: Nikil Shyamsunder
     netid: nvs26
-  - name: Pradhi Pakkrakari
+  - name: Pradhi Pakkerakari
     netid: sp2362
 # Your PM.
 pm:
@@ -16,7 +16,7 @@ title: "A Decentralized Prescription Validator"
 # OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
 git-repo: "https://github.com/Nikil-Shyamsunder/cs3110-final-proj"
 # Replace the URL with your own demo video.
-demo-video-url: https://youtu.be/A0Q7PPWo2AQ
+demo-video-url: https://youtu.be/MIWoz610ecw
 # Write a short, attention-grabbing description of your project.
 desc: >
   Our project is a blockchain application that changes the power dynamic in prescription validation in the healthcare system. 
