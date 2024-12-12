@@ -1,8 +1,11 @@
+(* Types of roles that will be managed as an account for the program that is
+   Doctor, Pharmacist, and Patient.*)
 type role =
   | Doctor
   | Pharmacist
   | Patient
 
+(* Type representing a user *)
 type t = {
   role : role;
   username : string;
@@ -10,11 +13,13 @@ type t = {
   task_list : int list;
 }
 
+(** [role_to_string] converts a role of a user to a string *)
 let role_to_string = function
   | Patient -> "patient"
   | Doctor -> "doctor"
   | Pharmacist -> "pharmacist"
 
+(** [string_to_role] converts a string to a role of a user *)
 let string_to_role = function
   | "patient" -> Patient
   | "doctor" -> Doctor
@@ -37,7 +42,6 @@ let find_user accounts_path username =
       | _ -> false)
     accounts_csv
 
-(* Helper function to get a user's task list from the accounts CSV *)
 let get_user_task_list accounts_path username =
   match find_user accounts_path username with
   | None -> None (* Return None if the user is not found *)
@@ -55,7 +59,6 @@ let get_user_task_list accounts_path username =
       Some task_ids
   | Some _ -> failwith "Malformed accounts CSV: Expected 4 columns per row"
 
-(* Helper function to update the final column of a user's row *)
 let update_user_tasks (accounts_csv : Csv.t ref) (username : string) task_id =
   accounts_csv :=
     List.map
