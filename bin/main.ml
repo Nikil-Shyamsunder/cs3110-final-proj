@@ -1,5 +1,3 @@
-[@@@warning "-a"]
-
 module Auth = Prescription_validator.Authenticator
 module Account = Prescription_validator.Account
 module Pharmacist = Prescription_validator.Pharmacist
@@ -74,7 +72,6 @@ let patient_driver username pwd role lst =
 
 (* Function to ask a doctor to add a new task to the blockchain *)
 let doctor_driver username pwd role lst =
-  let usr = Doctor.create_user username pwd role in
   print_endline
     ("Doctor " ^ username ^ ", enter a new task to publish to blockchain:");
   print_endline
