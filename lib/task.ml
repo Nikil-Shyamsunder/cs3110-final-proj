@@ -54,14 +54,11 @@ let display_tasks_without_votes (tasks_csv : Csv.t) task_ids =
 
   if task_ids = [] then "There are no tasks to display.\n"
   else
-    (* Initialize the result string with the header *)
     let result =
       Printf.sprintf "%-8s | %-15s | %-15s\n" "Task ID" "Diagnosis"
         "Prescription"
       ^ Printf.sprintf "-----------------------------------------------------\n"
     in
-
-    (* For each task ID, find and format the corresponding task *)
     let tasks_string =
       List.fold_left
         (fun acc task_id ->
@@ -70,8 +67,6 @@ let display_tasks_without_votes (tasks_csv : Csv.t) task_ids =
               acc
               ^ Printf.sprintf "Task with ID %d not found in tasks.\n" task_id
           | Some task_row ->
-              (* Extract the desired columns: Task ID, Diagnosis,
-                 Prescription *)
               let task_id = List.nth task_row 0 in
               let diagnosis = List.nth task_row 1 in
               let prescription = List.nth task_row 2 in
@@ -93,7 +88,6 @@ let string_to_task_ids task_list_str =
   then invalid_arg "Input string must be enclosed in square brackets"
   else
     let content = String.sub trimmed_str 1 (String.length trimmed_str - 2) in
-    (* Split by commas and process *)
     content |> String.split_on_char ',' |> List.map String.trim
     |> List.filter (fun s -> s <> "")
     |> List.map int_of_string
