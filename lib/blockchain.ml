@@ -7,7 +7,6 @@ let create_genesis_block difficulty =
   let timestamp = string_of_float (Sys.time ()) in
   mine_block 0 timestamp [ [ "Genesis Block" ] ] "0" difficulty
 
-(* Creates a new block by mining *)
 let create_block (blockchain : t) tasks_csv difficulty =
   let index = List.length blockchain in
   let timestamp = Sys.time () in
@@ -19,7 +18,6 @@ let create_block (blockchain : t) tasks_csv difficulty =
   let timestamp = string_of_float timestamp in
   mine_block index timestamp tasks_csv previous_hash difficulty
 
-(* Validate the blockchain *)
 let validate_blockchain (blockchain : t) : bool =
   let rec validate_chain = function
     | [] | [ _ ] ->
@@ -36,7 +34,9 @@ let validate_blockchain (blockchain : t) : bool =
   in
   validate_chain blockchain
 
-(* Serialize a block to JSON *)
+(** [block_to_json block] is a helper function to convert the block data into a
+    json with data like index, timestamp, tasks_csv, previous_hash, nonce, hash.
+*)
 let block_to_json (block : Block.t) =
   `Assoc
     [
@@ -52,7 +52,7 @@ let block_to_json (block : Block.t) =
       ("hash", `String block.hash);
     ]
 
-(* Deserialize a block from JSON *)
+(** [block_of_json json] converts a json object into a block. *)
 let block_of_json json =
   let open Yojson.Basic.Util in
   {
@@ -66,21 +66,17 @@ let block_of_json json =
     hash = json |> member "hash" |> to_string;
   }
 
-(* Serialize a blockchain to JSON *)
 let blockchain_to_json blockchain = `List (List.map block_to_json blockchain)
 
-(* Write blockchain to a file *)
 let save_blockchain_to_file blockchain filename =
   let json = blockchain_to_json blockchain in
   let oc = open_out filename in
   Yojson.Basic.pretty_to_channel oc json;
   close_out oc
 
-(* Deserialize a blockchain from JSON *)
 let blockchain_of_json json =
   json |> Yojson.Basic.Util.to_list |> List.map block_of_json
 
-(* Load blockchain from a file *)
 let load_blockchain_from_file filename =
   let ic = open_in filename in
   let json = Yojson.Basic.from_channel ic in

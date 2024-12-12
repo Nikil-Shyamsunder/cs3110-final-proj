@@ -1,6 +1,5 @@
 include Account
 
-(* Main function to add a new record and update accounts *)
 let add_diagnosis_prescription (tasks_csv_ref : Csv.t ref)
     (accounts_csv_ref : Csv.t ref) (doctor : string) (patient : string)
     diagnosis prescription =
