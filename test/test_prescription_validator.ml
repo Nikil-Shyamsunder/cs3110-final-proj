@@ -359,8 +359,7 @@ let test_create_genesis_block _ =
     ~msg:"Genesis block tasks mismatch"
 
 (** [test_create_block] checks if the blocks are created properly and the verify
-    that the block's index, previuos hash, has validity, and tasks are correct.
-*)
+    that the block's index, previuos hash, has validity, and tasks are correct. *)
 let test_create_block _ =
   let difficulty = 2 in
   let blockchain = [ create_genesis_block difficulty ] in
@@ -555,7 +554,112 @@ let test_display_tasks_without_votes _ =
   assert_equal
     ~printer:(fun x -> x)
     (normalize expected_output)
-    (normalize actual_output)
+    (normalize actual_output);
+
+  let tasks_csv =
+    [
+      [
+        "1";
+        "Diagnosis1";
+        "Prescription1";
+        "3";
+        "Voter1,Voter2,Voter3";
+        "2";
+        "Voter4,Voter5";
+      ];
+      [
+        "2";
+        "Diagnosis2";
+        "Prescription2";
+        "5";
+        "Voter6,Voter7,Voter8,Voter9,Voter10";
+        "1";
+        "Voter11";
+      ];
+    ]
+  in
+  let task_ids = [ 3 ] in
+  let expected_output =
+    "Task ID  | Diagnosis       | Prescription   \n\
+     -----------------------------------------------------\n\
+     Task with ID 3 not found in tasks.\n"
+  in
+  assert_equal
+    ~printer:(fun x -> x)
+    (String.trim expected_output)
+    (String.trim (display_tasks_without_votes tasks_csv task_ids));
+
+  let tasks_csv =
+    [
+      [
+        "1";
+        "Diagnosis1";
+        "Prescription1";
+        "3";
+        "Voter1,Voter2,Voter3";
+        "2";
+        "Voter4,Voter5";
+      ];
+      [
+        "2";
+        "Diagnosis2";
+        "Prescription2";
+        "5";
+        "Voter6,Voter7,Voter8,Voter9,Voter10";
+        "1";
+        "Voter11";
+      ];
+      [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
+    ]
+  in
+  let task_ids = [ 1; 2; 3 ] in
+  let expected_output =
+    "Task ID  | Diagnosis       | Prescription   \n\
+     -----------------------------------------------------\n\
+     1        | Diagnosis1      | Prescription1  \n\
+     2        | Diagnosis2      | Prescription2  \n\
+     3        | Diagnosis3      | Prescription3  \n"
+  in
+  assert_equal
+    ~printer:(fun x -> x)
+    (String.trim expected_output)
+    (String.trim (display_tasks_without_votes tasks_csv task_ids));
+
+  let tasks_csv =
+    [
+      [
+        "1";
+        "Diagnosis1";
+        "Prescription1";
+        "3";
+        "Voter1,Voter2,Voter3";
+        "2";
+        "Voter4,Voter5";
+      ];
+      [
+        "2";
+        "Diagnosis2";
+        "Prescription2";
+        "5";
+        "Voter6,Voter7,Voter8,Voter9,Voter10";
+        "1";
+        "Voter11";
+      ];
+      [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
+    ]
+  in
+  let task_ids = [ 1; 2; 3 ] in
+  let expected_output =
+    "Task ID  | Diagnosis       | Prescription   \n\
+     -----------------------------------------------------\n\
+     1        | Diagnosis1      | Prescription1  \n\
+     2        | Diagnosis2      | Prescription2  \n\
+     3        | Diagnosis3      | Prescription3  \n"
+  in
+  assert_equal
+    ~printer:(fun x -> x)
+    (String.trim expected_output)
+    (String.trim (display_tasks_without_votes tasks_csv task_ids))
 
 (** [test_string_to_task_ids] checks if the string is properly converted to a
     list of task IDs *)
@@ -581,8 +685,6 @@ let test_string_to_task_ids _ =
   assert_equal
     [ 1; 10; 100; 1000; 10000 ]
     (string_to_task_ids "[1,10,100,1000,10000]")
-
-(* ======================= TEST PATIENT ======================= *)
 
 (* ======================= TEST PATIENT ======================= *)
 
