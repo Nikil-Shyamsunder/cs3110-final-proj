@@ -11,7 +11,9 @@ let get_all_task_ids (tasks_csv : Csv.t ref) =
 let find_task_row (tasks_csv : Csv.t ref) task_id =
   List.find_opt (fun row -> List.hd row = string_of_int task_id) !tasks_csv
 
-(* Helper to update a task row with a vote *)
+(** [update_task_csv tasks_csv task_id username vote] is a helper function that
+    updates the [tasks_csv] whenver a user votes on a task_id with yes or no
+    vote. *)
 let update_task_csv (tasks_csv : Csv.t ref) task_id username vote =
   tasks_csv :=
     List.map
@@ -57,9 +59,6 @@ let update_task_csv (tasks_csv : Csv.t ref) task_id username vote =
           | _ -> row
         else row)
       !tasks_csv
-
-(** [vote_on_task_core accounts_csv tasks_csv user task_id vote] records a vote
-    on a task and updates the user's task list. *)
 
 let vote_on_task_core (accounts_csv : Csv.t ref) (tasks_csv : Csv.t ref)
     (user : t) task_id vote =
