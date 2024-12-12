@@ -35,13 +35,11 @@ let auth username pw =
 
 (* Function to write an account to a CSV file *)
 let create_account username pw role =
-  let filename = accounts_path in
-  let out_channel = open_out_gen [ Open_append; Open_creat ] 0o666 filename in
-  (* Write the account information with the fourth column as an empty list *)
-  Printf.fprintf out_channel "%s,%s,%s,\"[]\"\n" username pw role;
-  close_out out_channel;
-  Printf.printf
-    "Successfully created %s. Quitting program, restart and login.\n" username
+  (* Create a new row for the account information *)
+  let new_row = [ username; pw; role; "[]" ] in
+
+  (* Append the new row to the CSV reference *)
+  accounts_csv := !accounts_csv @ [ new_row ]
 
 (* Function to authenticate a user *)
 let login () =
