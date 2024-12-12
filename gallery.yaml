@@ -12,18 +12,17 @@ pm:
   name: Anya Yerramilli
   netid: ay326
 publish: false
-title: "The Complete Caml Calculator (CCC)"
+title: "A Decentralized Prescription Validator"
 # OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
 git-repo: "https://github.com/Nikil-Shyamsunder/cs3110-final-proj"
 # Replace the URL with your own demo video.
 demo-video-url: https://youtu.be/A0Q7PPWo2AQ
 # Write a short, attention-grabbing description of your project.
 desc: >
-  Our project is a blockchain application . It supports standard mathematical
-  operations like addition, multiplication, negation, and division on both
-  integers and floating-point numbers. The interface is completely
-  programmable--new functions can easily be defined and assigned to new "keys"
-  in the visual interface.
+  Our project is a blockchain application that changes the power dynamic in prescription validation in the healthcare system. 
+  Namely, it reorganizes the power hierarchy between the patient, pharmacist and physician by implementing a voter-based system 
+  for pharmacists to approve prescriptions given to certain patients by certain doctors. 
 
-  Standard visual I/O is supported, but the calculator can also emit sound. By
-  pressing down a special key, it can play a fugue by J.S. Bach.
+  Through our systems, patients no longer have to rely on orders from specific pharmacies or pharmacists. On a large scale, patients
+  can get their prescriptions approved within seconds, and through the blackbox, blockchain system, can order from any online pharmacy 
+  of their choosing, supporting the rise of online, e-commerce pharmaceutical platforms. 
