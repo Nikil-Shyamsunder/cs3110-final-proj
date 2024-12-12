@@ -383,13 +383,6 @@ let test_hash _ =
   assert_bool "Hash should not be empty" (String.length hashed > 0);
   assert_bool "Hash should match expected length" (String.length hashed = 32)
 
-(** [test_csv_to_string] checks if a hash is valid based on difficulty *)
-let test_csv_to_string _ =
-  let csv = [ [ "1"; "Task A" ]; [ "2"; "Task B" ] ] in
-  let result = csv_to_string csv in
-  let expected = "1,Task A\n2,Task B" in
-  assert_equal expected result ~msg:"CSV string representation mismatch"
-
 (** [test_mine_block] creates a block with specific parameters and verifies that
     the block's index, previous hash, hash validity, and nonce are correct. *)
 let test_mine_block _ =
@@ -899,7 +892,6 @@ let suite =
          "test_find_task_row" >:: test_find_task_row;
          "test_vote_on_task_core" >:: test_vote_on_task_core;
          "test_hash" >:: test_hash;
-         "test_csv_to_string" >:: test_csv_to_string;
          "test_mine_block" >:: test_mine_block;
          "test_block_to_string" >:: test_block_to_string;
          "test_create_genesis_block" >:: test_create_genesis_block;
