@@ -1,9 +1,5 @@
 type t = Csv.t
 
-(** Helper to parse voter IDs from a string *)
-let parse_voter_ids voter_ids_str =
-  String.split_on_char ',' voter_ids_str |> List.map String.trim
-
 let display_tasks_from_ids (tasks_csv : Csv.t) task_ids =
   (* Helper function to find a task by task ID in the tasks CSV *)
   let find_task tasks_csv task_id =
@@ -89,7 +85,16 @@ let display_tasks_without_votes (tasks_csv : Csv.t) task_ids =
     tasks_string
 
 let string_to_task_ids task_list_str =
-  String.sub (String.trim task_list_str) 1 (String.length task_list_str - 2)
-  |> String.split_on_char ',' (* Split by commas *)
-  |> List.filter (fun s -> String.trim s <> "") (* Remove empty strings *)
-  |> List.map int_of_string (* Convert to integers *)
+  let trimmed_str = String.trim task_list_str in
+  (* Ensure the string starts with '[' and ends with ']' *)
+  if
+    String.length trimmed_str < 2
+    || trimmed_str.[0] <> '['
+    || trimmed_str.[String.length trimmed_str - 1] <> ']'
+  then invalid_arg "Input string must be enclosed in square brackets"
+  else
+    let content = String.sub trimmed_str 1 (String.length trimmed_str - 2) in
+    (* Split by commas and process *)
+    content |> String.split_on_char ',' |> List.map String.trim
+    |> List.filter (fun s -> s <> "")
+    |> List.map int_of_string

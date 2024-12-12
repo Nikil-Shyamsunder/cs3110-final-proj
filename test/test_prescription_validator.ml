@@ -467,7 +467,27 @@ let test_display_tasks_from_ids _ =
 let test_string_to_task_ids _ =
   assert_equal [ 1; 2; 3 ] (string_to_task_ids "[1,2,3]");
   assert_equal [ 10; 20; 30 ] (string_to_task_ids "[10,20,30]");
-  assert_equal [] (string_to_task_ids "[]")
+  assert_equal [] (string_to_task_ids "[]");
+
+  (* Cases with spaces *)
+  assert_equal [ 1; 2; 3 ] (string_to_task_ids "[ 1, 2, 3 ]");
+  assert_equal [ 100; 200 ] (string_to_task_ids "[100, 200 ]");
+  (* Cases with trailing/leading whitespace in the input string *)
+  assert_equal [ 1; 2; 3 ] (string_to_task_ids " [1,2,3] ");
+  assert_equal [] (string_to_task_ids " [] ");
+  (* Cases with single element *)
+  assert_equal [ 42 ] (string_to_task_ids "[42]");
+  assert_equal [ 999 ] (string_to_task_ids "[ 999 ]");
+
+  (* Cases with larger lists*)
+  assert_equal
+    [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10 ]
+    (string_to_task_ids "[1,2,3,4,5,6,7,8,9,10]");
+  assert_equal
+    [ 1; 10; 100; 1000; 10000 ]
+    (string_to_task_ids "[1,10,100,1000,10000]")
+
+(* ======================= TEST PATIENT ======================= *)
 
 let test_display_prescription_statuses _ =
   (* Mock CSV reference *)
