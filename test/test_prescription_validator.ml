@@ -464,6 +464,100 @@ let test_display_tasks_from_ids _ =
     (normalize expected_output)
     (normalize actual_output)
 
+let test_display_tasks_without_votes _ =
+  let tasks_csv =
+    [
+      [
+        "1";
+        "Diagnosis1";
+        "Prescription1";
+        "3";
+        "Voter1,Voter2,Voter3";
+        "2";
+        "Voter4,Voter5";
+      ];
+      [
+        "2";
+        "Diagnosis2";
+        "Prescription2";
+        "5";
+        "Voter6,Voter7,Voter8,Voter9,Voter10";
+        "1";
+        "Voter11";
+      ];
+      [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
+    ]
+  in
+  (* List of task IDs to display *)
+  let task_ids = [ 1; 2 ] in
+  let expected_output =
+    "Task ID  | Diagnosis       | Prescription    | Yes Vote | No Vote\n\
+     --------------------------------------------------------------\n\
+     1        | Diagnosis1      | Prescription1   | 3        | 2       \n\
+     2        | Diagnosis2      | Prescription2   | 5        | 1       \n"
+  in
+
+  (* Actual output from the function *)
+  let actual_output = display_tasks_from_ids tasks_csv task_ids in
+
+  (* Normalize whitespace for comparison *)
+  let normalize str =
+    String.trim str |> String.split_on_char '\n' |> List.map String.trim
+    |> String.concat "\n"
+  in
+
+  assert_equal
+    ~printer:(fun x -> x)
+    (normalize expected_output)
+    (normalize actual_output)
+
+let test_display_tasks_without_votes _ =
+  let tasks_csv =
+    [
+      [
+        "1";
+        "Diagnosis1";
+        "Prescription1";
+        "3";
+        "Voter1,Voter2,Voter3";
+        "2";
+        "Voter4,Voter5";
+      ];
+      [
+        "2";
+        "Diagnosis2";
+        "Prescription2";
+        "5";
+        "Voter6,Voter7,Voter8,Voter9,Voter10";
+        "1";
+        "Voter11";
+      ];
+      [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
+    ]
+  in
+  (* List of task IDs to display *)
+  let task_ids = [ 1; 2 ] in
+  let expected_output =
+    "Task ID  | Diagnosis       | Prescription   \n\
+     -----------------------------------------------------\n\
+     1        | Diagnosis1      | Prescription1  \n\
+     2        | Diagnosis2      | Prescription2  \n"
+  in
+
+  (* Actual output from the function *)
+  let actual_output = display_tasks_without_votes tasks_csv task_ids in
+
+  (* Normalize whitespace for comparison *)
+  let normalize str =
+    String.trim str |> String.split_on_char '\n' |> List.map String.trim
+    |> String.concat "\n"
+  in
+
+  assert_equal
+    ~printer:(fun x -> x)
+    (normalize expected_output)
+    (normalize actual_output)
+
 let test_string_to_task_ids _ =
   assert_equal [ 1; 2; 3 ] (string_to_task_ids "[1,2,3]");
   assert_equal [ 10; 20; 30 ] (string_to_task_ids "[10,20,30]");
@@ -492,6 +586,7 @@ let suite =
          "test_save_blockchain_to_file" >:: test_save_blockchain_to_file;
          "test_load_blockchain_from_file" >:: test_load_blockchain_from_file;
          "test_display_tasks_from_ids" >:: test_display_tasks_from_ids;
+         "test_display_tasks_without_votes" >:: test_display_tasks_without_votes;
          "test_string_to_task_ids" >:: test_string_to_task_ids;
        ]
 
