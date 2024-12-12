@@ -11,6 +11,85 @@ open Prescription_validator.Block
 open Prescription_validator.Blockchain
 open Prescription_validator
 
+(* ======================= TEST AUTHENTICATOR ======================= *)
+
+(* Helper function to create a temporary CSV file *)
+let create_temp_csv rows =
+  let filename = Filename.temp_file "test_users" ".csv" in
+  Csv.save filename rows;
+  filename
+
+(* Helper function to delete a temporary file *)
+let delete_temp_file filename = Sys.remove filename
+
+let test_load_users _ =
+  let rows =
+    [
+      [ "user1"; "pass1"; "admin"; "data1" ];
+      [ "user2"; "pass2"; "user"; "data2" ];
+      [ "user3"; "pass3"; "user"; "data3" ];
+    ]
+  in
+  let filename = create_temp_csv rows in
+  let users = load_users filename in
+  assert_equal users
+    [
+      ("user1", "pass1", "admin", "data1");
+      ("user2", "pass2", "user", "data2");
+      ("user3", "pass3", "user", "data3");
+    ];
+  delete_temp_file filename
+
+let test_authenticate_success _ =
+  let rows =
+    [
+      [ "user1"; "pass1"; "admin"; "data1" ];
+      [ "user2"; "pass2"; "user"; "data2" ];
+      [ "user3"; "pass3"; "user"; "data3" ];
+    ]
+  in
+  let filename = create_temp_csv rows in
+  let users = load_users filename in
+  (match authenticate "user1" "pass1" users with
+  | Some (username, password, role, data) ->
+      assert_equal username "user1";
+      assert_equal password "pass1";
+      assert_equal role "admin";
+      assert_equal data "data1"
+  | None -> assert_failure "Expected authentication to succeed.");
+  delete_temp_file filename
+
+let test_authenticate_failure _ =
+  let rows =
+    [
+      [ "user1"; "pass1"; "admin"; "data1" ];
+      [ "user2"; "pass2"; "user"; "data2" ];
+      [ "user3"; "pass3"; "user"; "data3" ];
+    ]
+  in
+  let filename = create_temp_csv rows in
+  let users = load_users filename in
+  (match authenticate "user1" "wrongpass" users with
+  | Some _ -> assert_failure "Expected authentication to fail."
+  | None -> ());
+  delete_temp_file filename
+
+let test_authenticate_nonexistent_user _ =
+  let rows =
+    [
+      [ "user1"; "pass1"; "admin"; "data1" ];
+      [ "user2"; "pass2"; "user"; "data2" ];
+      [ "user3"; "pass3"; "user"; "data3" ];
+    ]
+  in
+  let filename = create_temp_csv rows in
+  let users = load_users filename in
+  (match authenticate "nonexistent" "pass" users with
+  | Some _ ->
+      assert_failure "Expected authentication to fail for nonexistent user."
+  | None -> ());
+  delete_temp_file filename
+
 (* ======================= TEST ACCOUNT ======================= *)
 
 (** [test_create_doctor] creates a doctor and checks the account to ensure that
@@ -359,8 +438,7 @@ let test_create_genesis_block _ =
     ~msg:"Genesis block tasks mismatch"
 
 (** [test_create_block] checks if the blocks are created properly and the verify
-    that the block's index, previuos hash, has validity, and tasks are correct.
-*)
+    that the block's index, previuos hash, has validity, and tasks are correct. *)
 let test_create_block _ =
   let difficulty = 2 in
   let blockchain = [ create_genesis_block difficulty ] in
@@ -730,6 +808,16 @@ let suite =
          "test_display_tasks_without_votes" >:: test_display_tasks_without_votes;
          "test_string_to_task_ids" >:: test_string_to_task_ids;
          "test_patient_modules" >:: test_display_prescription_statuses;
+         "test_load_users" >:: test_load_users;
+         "test_authenticate_success" >:: test_authenticate_success;
+         "test_authenticate_failure" >:: test_authenticate_failure;
+         "test_authenticate_nonexistent_user"
+         >:: test_authenticate_nonexistent_user;
+         "test_load_users" >:: test_load_users;
+         "test_authenticate_success" >:: test_authenticate_success;
+         "test_authenticate_failure" >:: test_authenticate_failure;
+         "test_authenticate_nonexistent_user"
+         >:: test_authenticate_nonexistent_user;
        ]
 
 let () = run_test_tt_main suite
