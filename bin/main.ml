@@ -13,21 +13,15 @@ module Blockchain = Prescription_validator.Blockchain
 
 (* Set file paths *)
 let accounts_path = "data/accounts.csv"
-let tasks_path = "data/tasks.csv"
+let blockchain_path = "data/blockchain.json"
 let accounts_csv = ref (Csv.load accounts_path)
-let blockchain = Blockchain.load_blockchain_from_file "data/blockchain.json"
+let blockchain = Blockchain.load_blockchain_from_file blockchain_path
 
 let () =
   if Blockchain.validate_blockchain blockchain then ()
   else failwith "You're blockchain is invalid. You cannot login. Exiting... "
 
 let tasks_csv = ref (List.hd blockchain).tasks_csv
-
-(* let blockchain = [ Blockchain.create_genesis_block 2 ] let block =
-   Blockchain.create_block blockchain !tasks_csv 2;;
-
-   let blockchain = block :: blockchain in Blockchain.save_blockchain_to_file
-   blockchain "data/blockchain.json" *)
 
 (* Welcome message *)
 let welcome_message () =
