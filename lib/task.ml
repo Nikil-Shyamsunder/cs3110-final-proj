@@ -1,5 +1,14 @@
 type t = Csv.t
 
+let task_id task = task.task_id
+let diagnosis task = task.diagnosis
+let prescription task = task.prescription
+let vote_count task = task.vote_count
+let yes_votes vote_count = vote_count.yes_votes
+let yes_voters vote_count = vote_count.yes_voters
+let no_votes vote_count = vote_count.no_votes
+let no_voters vote_count = vote_count.no_voters
+
 (** Helper to parse voter IDs from a string *)
 let parse_voter_ids voter_ids_str =
   String.split_on_char ',' voter_ids_str |> List.map String.trim

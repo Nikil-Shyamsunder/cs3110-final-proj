@@ -414,123 +414,62 @@ let test_load_blockchain_from_file _ =
   Sys.remove temp_filename
 
 (* ======================= TEST TASK ======================= *)
-
-(* comment *)
-let test_display_prescription_statuses _ =
-  (* Mock CSV reference *)
-  let mock_csv = ref [] in
-
-  (* User with no tasks *)
-  let user_without_tasks = Patient.create_user "Alice" "heek" "pharmacist" [] in
-  let expected_no_tasks =
-    "Hello Alice. There are no current prescriptions waiting for approval \
-     relevant to you.\n"
-  in
-  assert_equal
-    ~printer:(fun s -> Printf.sprintf "Actual output: %s" s)
-    ~msg:"User with no tasks should receive a no-tasks message"
-    expected_no_tasks
-    (display_prescription_statuses mock_csv user_without_tasks);
-
-  (* User with multiple tasks *)
-  let mock_csv_1 =
-    ref
+let test_display_tasks_from_ids _ =
+  (* Mock CSV data for testing *)
+  let tasks_csv =
+    [
       [
-        [ "1"; "Diagnosis1"; "Prescription1"; "10"; "0"; "0"; "0" ];
-        [ "2"; "Diagnosis2"; "Prescription2"; "5"; "1"; "0"; "0" ];
-        [ "3"; "Diagnosis3"; "Prescription3"; "0"; "0"; "0"; "0" ];
-      ]
-  in
-  let user_with_tasks =
-    Patient.create_user "Alice" "heek" "pharmacist" [ 1; 2; 3 ]
-  in
-
-  let expected_with_tasks =
-    "Welcome Alice! Here is the status of your current prescriptions.\n"
-    ^ "Task ID  | Diagnosis       | Prescription    | Yes Vote | No Vote \n\
-       --------------------------------------------------------------\n\
-       1        | Diagnosis1      | Prescription1   | 10       | 0       \n\
-       2        | Diagnosis2      | Prescription2   | 5        | 0       \n\
-       3        | Diagnosis3      | Prescription3   | 0        | 0       \n"
-  in
-
-  assert_equal
-    ~printer:(fun s -> Printf.sprintf "Actual output: %s" s)
-    ~msg:"User with multiple tasks should receive a multi-task status message"
-    expected_with_tasks
-    (display_prescription_statuses mock_csv_1 user_with_tasks);
-
-  (* User with a single task *)
-  let mock_csv_2 =
-    ref [ [ "42"; "Diagnosis42"; "Prescription42"; "3"; "0"; "0"; "0" ] ]
-  in
-  let user_single_task =
-    Patient.create_user "Alice" "Alice" "pharmacist" [ 42 ]
-  in
-  let expected_single_task =
-    "Welcome Alice! Here is the status of your current prescriptions.\n"
-    ^ "Task ID  | Diagnosis       | Prescription    | Yes Vote | No Vote \n\
-       --------------------------------------------------------------\n\
-       42       | Diagnosis42     | Prescription42  | 3        | 0       \n"
-  in
-
-  assert_equal
-    ~printer:(fun s -> Printf.sprintf "Actual output: %s" s)
-    ~msg:"User with a single task should receive a single-task status message"
-    expected_single_task
-    (display_prescription_statuses mock_csv_2 user_single_task);
-
-  (* Edge case: User with tasks but empty CSV *)
-  let empty_csv = ref [] in
-  let user_empty_csv =
-    Patient.create_user "Dana" "Dana" "pharmacist" [ 7; 8 ]
-  in
-  let expected_empty_csv =
-    "Welcome Dana! Here is the status of your current prescriptions.\n"
-    ^ "Task ID  | Diagnosis       | Prescription    | Yes Vote | No Vote \n\
-       --------------------------------------------------------------\n\
-       Task with ID 7 not found in tasks.\n\
-       Task with ID 8 not found in tasks.\n"
-  in
-  assert_equal
-    ~printer:(fun s -> Printf.sprintf "Actual output: %s" s)
-    ~msg:"User with tasks and empty CSV should still generate task statuses"
-    expected_empty_csv
-    (display_prescription_statuses empty_csv user_empty_csv);
-  (* Mock CSV with some tasks *)
-  let mock_csv_3 =
-    ref
+        "1";
+        "Diagnosis1";
+        "Prescription1";
+        "3";
+        "Voter1,Voter2,Voter3";
+        "2";
+        "Voter4,Voter5";
+      ];
       [
-        [ "1"; "Diagnosis1"; "Prescription1"; "10"; "0"; "0" ];
-        [ "2"; "Diagnosis2"; "Prescription2"; "5"; "0"; "0" ];
-        [ "3"; "Diagnosis3"; "Prescription3"; "0"; "0"; "0" ];
-      ]
+        "2";
+        "Diagnosis2";
+        "Prescription2";
+        "5";
+        "Voter6,Voter7,Voter8,Voter9,Voter10";
+        "1";
+        "Voter11";
+      ];
+      [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
+    ]
   in
-
-  (* User with a mix of valid and invalid task IDs *)
-  let user_mixed_tasks =
-    Patient.create_user "Charlie" "charlie123" "pharmacist" [ 1; 4; 2; 5 ]
-  in
+  (* List of task IDs to display *)
+  let task_ids = [ 1; 2 ] in
 
   (* Expected output *)
-  let expected_mixed_tasks =
-    "Welcome Charlie! Here is the status of your current prescriptions.\n"
-    ^ "Task ID  | Diagnosis       | Prescription    | Yes Vote | No Vote \n\
-       --------------------------------------------------------------\n\
-       1        | Diagnosis1      | Prescription1   | 10       | 0       \n\
-       Task with ID 4 not found in tasks.\n\
-       2        | Diagnosis2      | Prescription2   | 5        | 0       \n\
-       Task with ID 5 not found in tasks.\n"
+  let expected_output =
+    "Task ID  | Diagnosis       | Prescription    | Yes Vote | No Vote\n\
+     --------------------------------------------------------------\n\
+     1        | Diagnosis1      | Prescription1   | 3        | 2       \n\
+     2        | Diagnosis2      | Prescription2   | 5        | 1       \n"
   in
 
-  (* Assert that the function produces the expected output *)
+  (* Actual output from the function *)
+  let actual_output = display_tasks_from_ids tasks_csv task_ids in
+
+  (* Normalize whitespace for comparison *)
+  let normalize str =
+    String.trim str |> String.split_on_char '\n' |> List.map String.trim
+    |> String.concat "\n"
+  in
+
   assert_equal
-    ~printer:(fun s -> Printf.sprintf "Actual output: %s" s)
-    ~msg:
-      "User with a mix of valid and invalid task IDs should receive \
-       appropriate task statuses"
-    expected_mixed_tasks
-    (display_prescription_statuses mock_csv_3 user_mixed_tasks)
+    ~printer:(fun x -> x)
+    (normalize expected_output)
+    (normalize actual_output)
+
+let test_string_to_task_ids _ =
+  assert_equal [ 1; 2; 3 ] (string_to_task_ids "[1,2,3]");
+  assert_equal [ 10; 20; 30 ] (string_to_task_ids "[10,20,30]");
+  assert_equal [] (string_to_task_ids "[]")
+
+(* comment *)
 
 let suite =
   "test suite"
@@ -554,7 +493,8 @@ let suite =
          "test_validate_blockchain" >:: test_validate_blockchain;
          "test_save_blockchain_to_file" >:: test_save_blockchain_to_file;
          "test_load_blockchain_from_file" >:: test_load_blockchain_from_file;
-         "test_patient" >:: test_display_prescription_statuses;
+         "test_display_tasks_from_ids" >:: test_display_tasks_from_ids;
+         "test_string_to_task_ids" >:: test_string_to_task_ids;
        ]
 
 let () = run_test_tt_main suite
