@@ -1,11 +1,12 @@
 type t = Csv.t
 
-(** Helper to parse voter IDs from a string *)
+(** [parse_voter_ids voter_ids_str] splits the [voter_ids_str] string by commas,
+    trims any whitespace from each voter ID, and returns a list of trimmed voter
+    IDs. *)
 let parse_voter_ids voter_ids_str =
   String.split_on_char ',' voter_ids_str |> List.map String.trim
 
 let display_tasks_from_ids (tasks_csv : Csv.t) task_ids =
-  (* Helper function to find a task by task ID in the tasks CSV *)
   let find_task tasks_csv task_id =
     List.find_opt
       (fun row ->
