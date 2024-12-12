@@ -12,19 +12,27 @@ open Prescription_validator.Blockchain
 open Prescription_validator
 
 (* ======================= TEST ACCOUNT ======================= *)
-let create_doctor _ =
+
+(** [test_create_doctor] creates a doctor and checks the account to ensure that
+    it is a valid doctor with proper username and with the role doctor. *)
+let test_create_doctor _ =
   let doctor = Doctor.create_user "Dr. xyz" "password123" "doctor" [] in
   assert_equal "doctor" (Doctor.role doctor);
   assert_equal "Dr. xyz" (Doctor.username doctor);
   assert_equal [] (Doctor.tasks doctor)
 
-let create_patient _ =
+(** [test_create_patient] creates a patient and checks the account to ensure
+    that it is a valid patient with proper username and with the role doctor. *)
+let test_create_patient _ =
   let patient = Patient.create_user "abc" "password123" "patient" [] in
   assert_equal "patient" (Patient.role patient);
   assert_equal "abc" (Patient.username patient);
   assert_equal [] (Patient.tasks patient)
 
-let create_pharmacist _ =
+(** [test_create_pharmacist] creates a pharmacist and checks the account to
+    ensure that it is a valid pharmacist with proper username and with the role
+    doctor. *)
+let test_create_pharmacist _ =
   let pharmacist =
     Pharmacist.create_user "pharm" "password123" "pharmacist" []
   in
@@ -32,7 +40,9 @@ let create_pharmacist _ =
   assert_equal "pharm" (Pharmacist.username pharmacist);
   assert_equal [] (Pharmacist.tasks pharmacist)
 
-let create_invalid _ =
+(** [test_create_invalid] creates an invalid user to check if our functions are
+    properly raising the errors. *)
+let test_create_invalid _ =
   assert_raises (Stdlib.Failure "input invalid") (fun () ->
       Account.create_user "invalid" "invalid" "invalid" []);
   assert_raises (Stdlib.Failure "input invalid") (fun () ->
@@ -42,6 +52,8 @@ let create_invalid _ =
   assert_raises (Stdlib.Failure "input invalid") (fun () ->
       Pharmacist.create_user "invalid" "invalid" "invalid" [])
 
+(** [test_find_user] finds a user from the account csv when the user provides
+    their details.*)
 let test_find_user _ =
   (* Create a temporary CSV file *)
   let accounts_file = "temp_accounts.csv" in
@@ -53,16 +65,15 @@ let test_find_user _ =
   in
   Csv.save accounts_file accounts_csv;
 
-  (* Test find_user function *)
   let result = Account.find_user accounts_file "patient1" in
   let expected = Some [ "patient1"; "password"; "patient"; "[3,4]" ] in
 
-  (* Assert result *)
   assert_equal expected result ~msg:"Failed to find correct user.";
-
-  (* Clean up the temporary file *)
   Sys.remove accounts_file
 
+(** [test_get_user_task_list] creates a temporary CSV file with testing data,
+    and then calls the function to get the task list for a specific user, and
+    then verifies that the returned task list matches the expected task list. *)
 let test_get_user_task_list _ =
   (* Helper function to create a temporary CSV file *)
   let create_temp_csv data =
@@ -71,7 +82,6 @@ let test_get_user_task_list _ =
     temp_file
   in
 
-  (* Case 1: Normal case *)
   let normal_csv_data =
     [
       [ "alice"; "password1"; "doctor"; "[1,2,3]" ];
@@ -94,6 +104,10 @@ let test_get_user_task_list _ =
   Sys.remove temp_file_normal
 
 (* ======================= TEST DOCTOR ======================= *)
+
+(** [test_add_diagnosis_prescription _] creates temporary CSV references for
+    tasks and accounts, adds a diagnosis and prescription, and verifies that the
+    tasks and accounts CSVs are updated correctly. *)
 let test_add_diagnosis_prescription _ =
   let tasks_csv_ref =
     ref
@@ -130,6 +144,10 @@ let test_add_diagnosis_prescription _ =
     ~msg:"accounts\n\n   CSV not updated correctly"
 
 (* ======================= TEST PHARMACIST ======================= *)
+
+(** [test_get_all_task_ids _] creates a temporary CSV file with testing data,
+    calls the function to get all task IDs, and verifies that the returned task
+    IDs match the expected task IDs. *)
 let test_get_all_task_ids _ =
   let temp_file = Filename.temp_file "tasks" ".csv" in
   let csv_data =
@@ -145,6 +163,9 @@ let test_get_all_task_ids _ =
   assert_equal [ 3; 2; 1 ] task_ids ~msg:"Failed to get all task ids correctly.";
   Sys.remove temp_file
 
+(** [test_find_task_row _] creates a temporary CSV file with testing data, calls
+    the function to find a task row by task ID, and verifies that the returned
+    task row matches the expected task row. *)
 let test_find_task_row _ =
   let temp_file = Filename.temp_file "tasks" ".csv" in
   let csv_data =
@@ -165,6 +186,9 @@ let test_find_task_row _ =
     ~msg:"Non-existent task should not be found.";
   Sys.remove temp_file
 
+(** [test_vote_on_task_core _] creates temporary CSV references for tasks and
+    accounts, records a vote on a task, updates the user's task list, and
+    verifies that the tasks and accounts CSVs are updated correctly. *)
 let test_vote_on_task_core _ =
   let temp_file_tasks = Filename.temp_file "tasks" ".csv" in
   let temp_file_accounts = Filename.temp_file "accounts" ".csv" in
@@ -271,21 +295,24 @@ let test_vote_on_task_core _ =
   Sys.remove temp_file_accounts
 
 (* ======================= TEST BLOCK ======================= *)
-(* Test case for hashing a string *)
+
+(** [test_hash] checks if a string is properly hashed to a correct value as
+    expected *)
 let test_hash _ =
   let data = "hello world" in
   let hashed = hash data in
   assert_bool "Hash should not be empty" (String.length hashed > 0);
   assert_bool "Hash should match expected length" (String.length hashed = 32)
 
-(* Test case for converting CSV to string *)
+(** [test_csv_to_string] checks if a hash is valid based on difficulty *)
 let test_csv_to_string _ =
   let csv = [ [ "1"; "Task A" ]; [ "2"; "Task B" ] ] in
   let result = csv_to_string csv in
   let expected = "1,Task A\n2,Task B" in
   assert_equal expected result ~msg:"CSV string representation mismatch"
 
-(* Test case for mining a block *)
+(** [test_mine_block] creates a block with specific parameters and verifies that
+    the block's index, previous hash, hash validity, and nonce are correct. *)
 let test_mine_block _ =
   let index = 1 in
   let timestamp = string_of_float (Unix.gettimeofday ()) in
@@ -299,7 +326,9 @@ let test_mine_block _ =
     (is_valid_hash block.hash difficulty);
   assert_bool "Nonce should be >= 0" (block.nonce >= 0)
 
-(* Test case for block string conversion *)
+(** [test_block_to_string _] creates a block with specific parameters, and
+    verifying that the string representation of the block matches the expected
+    string. *)
 let test_block_to_string _ =
   let index = 1 in
   let timestamp = "1234567890.123" in
@@ -314,7 +343,10 @@ let test_block_to_string _ =
   assert_equal expected result ~msg:"Block string representation mismatch"
 
 (* ======================= TEST BLOCKCHAIN ======================= *)
-(* Test case for creating the genesis block *)
+
+(** [test_create_genesis_block _] creates a genesis block that is the first
+    block in the blockchain with a specific difficulty, and verifying that the
+    block's index, previous hash, hash validity, and tasks are correct. *)
 let test_create_genesis_block _ =
   let difficulty = 2 in
   let genesis_block = create_genesis_block difficulty in
@@ -326,7 +358,9 @@ let test_create_genesis_block _ =
   assert_equal genesis_block.tasks_csv [ [ "Genesis Block" ] ]
     ~msg:"Genesis block tasks mismatch"
 
-(* Test case for creating a new block *)
+(** [test_create_block] checks if the blocks are created properly and the verify
+    that the block's index, previuos hash, has validity, and tasks are correct.
+*)
 let test_create_block _ =
   let difficulty = 2 in
   let blockchain = [ create_genesis_block difficulty ] in
@@ -339,7 +373,9 @@ let test_create_block _ =
     (is_valid_hash new_block.hash difficulty);
   assert_equal new_block.tasks_csv tasks_csv ~msg:"New block tasks mismatch"
 
-(* Test case for validating a blockchain *)
+(** [test_validate_blockchain] creates a blockchain with multiple blocks and
+    verifies that the blockchain is valid, then tampers with a block and
+    verifies that the blockchain is invalid *)
 let test_validate_blockchain _ =
   let difficulty = 2 in
   let genesis_block = create_genesis_block difficulty in
@@ -356,7 +392,9 @@ let test_validate_blockchain _ =
   assert_bool "Invalid blockchain after tampering"
     (not (validate_blockchain tampered_blockchain))
 
-(* Test case for block to json *)
+(** [test_blockchain_to_json] creates a blockchain with multiple blocks and
+    verifies that the JSON representation of the blockchain matches the expected
+    JSON *)
 let test_save_blockchain_to_file _ =
   let difficulty = 2 in
   let genesis_block = create_genesis_block difficulty in
@@ -383,6 +421,9 @@ let test_save_blockchain_to_file _ =
 
   Sys.remove temp_filename
 
+(** [test_load_blockchain_from_file] creates a blockchain with multiple blocks,
+    saves the blockchain to a file, loads the blockchain from the file, and
+    verifies that the loaded blockchain matches the original blockchain *)
 let test_load_blockchain_from_file _ =
   let difficulty = 2 in
   let genesis_block = create_genesis_block difficulty in
@@ -414,6 +455,9 @@ let test_load_blockchain_from_file _ =
   Sys.remove temp_filename
 
 (* ======================= TEST TASK ======================= *)
+
+(** [test_display_tasks_from_ids] checks if the tasks are correctly displayed
+    with their votes, whether yes or no, for the users with different ids. *)
 let test_display_tasks_from_ids _ =
   (* Mock CSV data for testing *)
   let tasks_csv =
@@ -464,53 +508,8 @@ let test_display_tasks_from_ids _ =
     (normalize expected_output)
     (normalize actual_output)
 
-let test_display_tasks_without_votes _ =
-  let tasks_csv =
-    [
-      [
-        "1";
-        "Diagnosis1";
-        "Prescription1";
-        "3";
-        "Voter1,Voter2,Voter3";
-        "2";
-        "Voter4,Voter5";
-      ];
-      [
-        "2";
-        "Diagnosis2";
-        "Prescription2";
-        "5";
-        "Voter6,Voter7,Voter8,Voter9,Voter10";
-        "1";
-        "Voter11";
-      ];
-      [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
-    ]
-  in
-  (* List of task IDs to display *)
-  let task_ids = [ 1; 2 ] in
-  let expected_output =
-    "Task ID  | Diagnosis       | Prescription    | Yes Vote | No Vote\n\
-     --------------------------------------------------------------\n\
-     1        | Diagnosis1      | Prescription1   | 3        | 2       \n\
-     2        | Diagnosis2      | Prescription2   | 5        | 1       \n"
-  in
-
-  (* Actual output from the function *)
-  let actual_output = display_tasks_from_ids tasks_csv task_ids in
-
-  (* Normalize whitespace for comparison *)
-  let normalize str =
-    String.trim str |> String.split_on_char '\n' |> List.map String.trim
-    |> String.concat "\n"
-  in
-
-  assert_equal
-    ~printer:(fun x -> x)
-    (normalize expected_output)
-    (normalize actual_output)
-
+(** [test_display_tasks_without_votes] checks if the tasks are correctly
+    displayed without the votes for different users with respective ids. *)
 let test_display_tasks_without_votes _ =
   let tasks_csv =
     [
@@ -558,11 +557,17 @@ let test_display_tasks_without_votes _ =
     (normalize expected_output)
     (normalize actual_output)
 
+(** [test_string_to_task_ids] checks if the string is properly converted to a
+    list of task IDs *)
 let test_string_to_task_ids _ =
   assert_equal [ 1; 2; 3 ] (string_to_task_ids "[1,2,3]");
   assert_equal [ 10; 20; 30 ] (string_to_task_ids "[10,20,30]");
   assert_equal [] (string_to_task_ids "[]")
 
+(* ======================= TEST PATIENT ======================= *)
+
+(** [test_display_prescription_statuses] checks if the prescription statuses are
+    correctly displayed for the user with different tasks. *)
 let test_display_prescription_statuses _ =
   (* Mock CSV reference *)
   let mock_csv = ref [] in
@@ -682,10 +687,10 @@ let test_display_prescription_statuses _ =
 let suite =
   "test suite"
   >::: [
-         "create_doctor" >:: create_doctor;
-         "create_patient" >:: create_patient;
-         "create_pharmacist" >:: create_pharmacist;
-         "create_invalid" >:: create_invalid;
+         "create_doctor" >:: test_create_doctor;
+         "create_patient" >:: test_create_patient;
+         "create_pharmacist" >:: test_create_pharmacist;
+         "create_invalid" >:: test_create_invalid;
          "test_find_user" >:: test_find_user;
          "test_get_user_task_list" >:: test_get_user_task_list;
          "test_add_diagnosis_prescription" >:: test_add_diagnosis_prescription;
