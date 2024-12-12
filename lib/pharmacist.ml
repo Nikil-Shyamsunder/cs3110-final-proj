@@ -66,6 +66,4 @@ let update_task_csv (tasks_csv : Csv.t ref) task_id username vote =
 let vote_on_task_core (accounts_csv : Csv.t ref) (tasks_csv : Csv.t ref)
     (user : t) task_id vote =
   update_task_csv tasks_csv task_id (username user) vote;
-  update_user_tasks accounts_csv (username user) task_id;
-  Printf.printf
-    "Your vote has been recorded, and the task has been added to your tasks.\n"
+  update_user_tasks accounts_csv (username user) task_id
