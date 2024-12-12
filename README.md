@@ -1,7 +1,7 @@
 # Decentralized Prescription Validator
 
 ## Overview
-  Our project is a blockchain application that changes the power dynamic in prescription validation in the healthcare system. 
+  A blockchain application that changes the power dynamic in prescription validation in the healthcare system. 
   Namely, it reorganizes the power hierarchy between the patient, pharmacist and physician by implementing a voter-based system 
   for pharmacists to approve prescriptions given to certain patients by certain doctors. Through our systems patients
    no longer have to rely on orders from specific pharmacies or pharmacists, and we aim 
