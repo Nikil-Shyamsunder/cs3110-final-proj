@@ -435,7 +435,8 @@ let test_create_genesis_block _ =
     ~msg:"Genesis block tasks mismatch"
 
 (** [test_create_block] checks if the blocks are created properly and the verify
-    that the block's index, previuos hash, has validity, and tasks are correct. *)
+    that the block's index, previuos hash, has validity, and tasks are correct.
+*)
 let test_create_block _ =
   let difficulty = 2 in
   let blockchain =
@@ -546,7 +547,7 @@ let test_load_blockchain_from_file _ =
     with their votes, whether yes or no, for the users with different ids. *)
 let test_display_tasks_from_ids _ =
   (* Mock CSV data for testing *)
-  let tasks_csv =
+  let csv_data =
     [
       [
         "1";
@@ -569,6 +570,7 @@ let test_display_tasks_from_ids _ =
       [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
     ]
   in
+  let tasks_csv = Task.of_csv csv_data in
   (* List of task IDs to display *)
   let task_ids = [ 1; 2 ] in
 
@@ -597,7 +599,7 @@ let test_display_tasks_from_ids _ =
 (** [test_display_tasks_without_votes] checks if the tasks are correctly
     displayed without the votes for different users with respective ids. *)
 let test_display_tasks_without_votes _ =
-  let tasks_csv =
+  let csv_data =
     [
       [
         "1";
@@ -620,6 +622,7 @@ let test_display_tasks_without_votes _ =
       [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
     ]
   in
+  let tasks_csv = Task.of_csv csv_data in
   (* List of task IDs to display *)
   let task_ids = [ 1; 2 ] in
   let expected_output =
@@ -643,7 +646,7 @@ let test_display_tasks_without_votes _ =
     (normalize expected_output)
     (normalize actual_output);
 
-  let tasks_csv =
+  let csv_data =
     [
       [
         "1";
@@ -665,6 +668,7 @@ let test_display_tasks_without_votes _ =
       ];
     ]
   in
+  let tasks_csv = Task.of_csv csv_data in
   let task_ids = [ 3 ] in
   let expected_output =
     "Task ID  | Diagnosis       | Prescription   \n\
@@ -676,7 +680,7 @@ let test_display_tasks_without_votes _ =
     (String.trim expected_output)
     (String.trim (display_tasks_without_votes tasks_csv task_ids));
 
-  let tasks_csv =
+  let csv_data =
     [
       [
         "1";
@@ -699,6 +703,7 @@ let test_display_tasks_without_votes _ =
       [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
     ]
   in
+  let tasks_csv = Task.of_csv csv_data in
   let task_ids = [ 1; 2; 3 ] in
   let expected_output =
     "Task ID  | Diagnosis       | Prescription   \n\
@@ -712,7 +717,7 @@ let test_display_tasks_without_votes _ =
     (String.trim expected_output)
     (String.trim (display_tasks_without_votes tasks_csv task_ids));
 
-  let tasks_csv =
+  let csv_data =
     [
       [
         "1";
@@ -735,6 +740,7 @@ let test_display_tasks_without_votes _ =
       [ "3"; "Diagnosis3"; "Prescription3"; "0"; ""; "0"; "" ];
     ]
   in
+  let tasks_csv = Task.of_csv csv_data in
   let task_ids = [ 1; 2; 3 ] in
   let expected_output =
     "Task ID  | Diagnosis       | Prescription   \n\
@@ -779,7 +785,7 @@ let test_string_to_task_ids _ =
     correctly displayed for the user with different tasks. *)
 let test_display_prescription_statuses _ =
   (* Mock CSV reference *)
-  let mock_csv = ref [] in
+  let mock_csv = ref (Task.of_csv []) in
 
   (* User with no tasks *)
   let user_without_tasks = Patient.create_user "Alice" "heek" "pharmacist" [] in
@@ -796,11 +802,12 @@ let test_display_prescription_statuses _ =
   (* User with multiple tasks *)
   let mock_csv_1 =
     ref
-      [
-        [ "1"; "Diagnosis1"; "Prescription1"; "10"; "0"; "0"; "0" ];
-        [ "2"; "Diagnosis2"; "Prescription2"; "5"; "1"; "0"; "0" ];
-        [ "3"; "Diagnosis3"; "Prescription3"; "0"; "0"; "0"; "0" ];
-      ]
+      (Task.of_csv
+         [
+           [ "1"; "Diagnosis1"; "Prescription1"; "10"; "0"; "0"; "0" ];
+           [ "2"; "Diagnosis2"; "Prescription2"; "5"; "1"; "0"; "0" ];
+           [ "3"; "Diagnosis3"; "Prescription3"; "0"; "0"; "0"; "0" ];
+         ])
   in
   let user_with_tasks =
     Patient.create_user "Alice" "heek" "pharmacist" [ 1; 2; 3 ]
@@ -823,7 +830,9 @@ let test_display_prescription_statuses _ =
 
   (* User with a single task *)
   let mock_csv_2 =
-    ref [ [ "42"; "Diagnosis42"; "Prescription42"; "3"; "0"; "0"; "0" ] ]
+    ref
+      (Task.of_csv
+         [ [ "42"; "Diagnosis42"; "Prescription42"; "3"; "0"; "0"; "0" ] ])
   in
   let user_single_task =
     Patient.create_user "Alice" "Alice" "pharmacist" [ 42 ]
@@ -842,7 +851,7 @@ let test_display_prescription_statuses _ =
     (display_prescription_statuses mock_csv_2 user_single_task);
 
   (* Edge case: User with tasks but empty CSV *)
-  let empty_csv = ref [] in
+  let empty_csv = ref (Task.of_csv []) in
   let user_empty_csv =
     Patient.create_user "Dana" "Dana" "pharmacist" [ 7; 8 ]
   in
@@ -861,11 +870,12 @@ let test_display_prescription_statuses _ =
   (* Mock CSV with some tasks *)
   let mock_csv_3 =
     ref
-      [
-        [ "1"; "Diagnosis1"; "Prescription1"; "10"; "0"; "0" ];
-        [ "2"; "Diagnosis2"; "Prescription2"; "5"; "0"; "0" ];
-        [ "3"; "Diagnosis3"; "Prescription3"; "0"; "0"; "0" ];
-      ]
+      (Task.of_csv
+         [
+           [ "1"; "Diagnosis1"; "Prescription1"; "10"; "0"; "0" ];
+           [ "2"; "Diagnosis2"; "Prescription2"; "5"; "0"; "0" ];
+           [ "3"; "Diagnosis3"; "Prescription3"; "0"; "0"; "0" ];
+         ])
   in
 
   (* User with a mix of valid and invalid task IDs *)

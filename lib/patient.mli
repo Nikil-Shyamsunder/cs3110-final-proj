@@ -16,6 +16,6 @@ val username : t -> string
 val tasks : t -> int list
 (** [tasks acc] returns the task list of the user [acc]. *)
 
-val display_prescription_statuses : Csv.t ref -> t -> string
+val display_prescription_statuses : Task.t ref -> t -> string
 (** [display_prescription_statuses prescriptions_csv user] returns a string
     representation of the prescriptions that the user has prescribed. *)
