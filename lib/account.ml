@@ -1,17 +1,23 @@
-(* Types of roles that will be managed as an account for the program that is
-   Doctor, Pharmacist, and Patient.*)
 type role =
   | Doctor
   | Pharmacist
   | Patient
 
-(* Type representing a user *)
 type t = {
   role : role;
   username : string;
   password : string;
   task_list : int list;
 }
+(** AF: - A value of type [t] represents a user account in the system. [role]
+    defines the user's type (Doctor, Pharmacist, or Patient). - [username] is
+    the unique identifier for the user. - [password] secures the user's account.
+    \- [task_list] contains IDs of tasks assigned to the user.
+
+    Representation Invariant (RI): - [username] must be a non-empty string. -
+    [password] must be a non-empty string. - [role] must be one of the valid
+    roles (Doctor, Pharmacist, Patient). - [task_list] must only contain
+    non-negative integers. *)
 
 (** [role_to_string] converts a role of a user to a string *)
 let role_to_string = function

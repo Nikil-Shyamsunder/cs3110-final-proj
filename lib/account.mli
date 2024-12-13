@@ -1,5 +1,7 @@
 type t
-(** Type representing a user *)
+(** AF: - [role] represents the occupation/role that a user represents, could be
+    of type Doctor, Pharmacist, or Patient RI: - type role must be either a
+    Doctor, Pharmacist, Patient *)
 
 val create_user : string -> string -> string -> int list -> t
 (** [create_user u p role_op] creates a new user with username [u], password

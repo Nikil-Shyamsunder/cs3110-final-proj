@@ -2,7 +2,6 @@ open Digest
 open Sys
 open Csv
 
-(* Block structure *)
 type t = {
   index : int;
   timestamp : string;
