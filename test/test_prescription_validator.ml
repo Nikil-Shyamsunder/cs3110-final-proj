@@ -392,11 +392,13 @@ let test_mine_block _ =
   let previous_hash = "0" in
   let difficulty = 5 in
   let block = mine_block index timestamp tasks_csv previous_hash difficulty in
-  assert_equal block.index index ~msg:"Block index mismatch";
-  assert_equal block.previous_hash previous_hash ~msg:"Previous hash mismatch";
+  assert_equal (Block.index block) index ~msg:"Block index mismatch";
+  assert_equal
+    (Block.previous_hash block)
+    previous_hash ~msg:"Previous hash mismatch";
   assert_bool "Hash should be valid based on difficulty"
-    (is_valid_hash block.hash difficulty);
-  assert_bool "Nonce should be >= 0" (block.nonce >= 0)
+    (is_valid_hash (Block.get_hash block) difficulty);
+  assert_bool "Nonce should be >= 0" (Block.nonce block >= 0)
 
 (** [test_block_to_string _] creates a block with specific parameters, and
     verifying that the string representation of the block matches the expected
@@ -408,7 +410,8 @@ let test_block_to_string _ =
   let previous_hash = "abc123" in
   let nonce = 42 in
   let block =
-    { index; timestamp; tasks_csv; previous_hash; nonce; hash = "dummy_hash" }
+    Block.create_block index timestamp tasks_csv previous_hash nonce
+      "dummy_hash"
   in
   let result = block_to_string block in
   let expected = "1|1234567890.123|1,Task A\n2,Task B|abc123|42" in
@@ -422,12 +425,13 @@ let test_block_to_string _ =
 let test_create_genesis_block _ =
   let difficulty = 2 in
   let genesis_block = create_genesis_block difficulty in
-  assert_equal genesis_block.index 0 ~msg:"Genesis block index mismatch";
-  assert_equal genesis_block.previous_hash "0"
-    ~msg:"Genesis block previous hash mismatch";
+  assert_equal (index genesis_block) 0 ~msg:"Genesis block index mismatch";
+  assert_equal
+    (previous_hash genesis_block)
+    "0" ~msg:"Genesis block previous hash mismatch";
   assert_bool "Genesis block hash should satisfy difficulty"
-    (is_valid_hash genesis_block.hash difficulty);
-  assert_equal genesis_block.tasks_csv [ [ "Genesis Block" ] ]
+    (is_valid_hash (get_hash genesis_block) difficulty);
+  assert_equal (tasks_csv genesis_block) [ [ "Genesis Block" ] ]
     ~msg:"Genesis block tasks mismatch"
 
 (** [test_create_block] checks if the blocks are created properly and the verify
@@ -440,13 +444,16 @@ let test_create_block _ =
   in
   let tasks_csv = [ [ "1"; "Task A" ]; [ "2"; "Task B" ] ] in
   let new_block = create_block blockchain tasks_csv difficulty in
-  assert_equal new_block.index 1 ~msg:"New block index mismatch";
+  assert_equal (index new_block) 1 ~msg:"New block index mismatch";
   let list_blockchain = Blockchain.list_repr blockchain in
-  assert_equal new_block.previous_hash (List.hd list_blockchain).hash
+  assert_equal (previous_hash new_block)
+    (get_hash (List.hd list_blockchain))
     ~msg:"New block previous hash mismatch";
   assert_bool "New block hash should satisfy difficulty"
-    (is_valid_hash new_block.hash difficulty);
-  assert_equal new_block.tasks_csv tasks_csv ~msg:"New block tasks mismatch"
+    (is_valid_hash (get_hash new_block) difficulty);
+  assert_equal
+    (Block.tasks_csv new_block)
+    tasks_csv ~msg:"New block tasks mismatch"
 
 (** [test_validate_blockchain] creates a blockchain with multiple blocks and
     verifies that the blockchain is valid, then tampers with a block and
@@ -462,12 +469,16 @@ let test_validate_blockchain _ =
   let block2 = create_block !blockchain tasks_csv_2 difficulty in
   blockchain := Blockchain.append_block !blockchain block2;
   (* Tamper with a block *)
-  let tampered_block = { block1 with hash = "tampered_hash" } in
+  let tampered_block =
+    Block.create_block (index block1) (timestamp block1) (tasks_csv block1)
+      (previous_hash block1) (nonce block1) "tampered_hash"
+  in
   let tampered_blockchain =
-    tampered_block :: List.tl (Blockchain.list_repr !blockchain)
+    Blockchain.chain_of_list
+      (tampered_block :: List.tl (Blockchain.list_repr !blockchain))
   in
   assert_bool "Invalid blockchain after tampering"
-    (not (validate_blockchain (Blockchain.chain_of_list tampered_blockchain)))
+    (not (validate_blockchain tampered_blockchain))
 
 let test_save_blockchain_to_file _ =
   let difficulty = 2 in

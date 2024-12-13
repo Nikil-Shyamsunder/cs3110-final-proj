@@ -10,6 +10,19 @@ type t = {
   nonce : int;
   hash : string;
 }
+(** Abstract type for a block *)
+
+let create_block index timestamp tasks_csv previous_hash nonce hash =
+  { index; timestamp; tasks_csv; previous_hash; nonce; hash }
+
+(** Getter functions for each field of the block *)
+let index block = block.index
+
+let timestamp block = block.timestamp
+let tasks_csv block = block.tasks_csv
+let previous_hash block = block.previous_hash
+let nonce block = block.nonce
+let get_hash block = block.hash
 
 (* Hashing utilities *)
 let hash data = Digest.to_hex (Digest.string data)
