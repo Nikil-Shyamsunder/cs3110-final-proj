@@ -101,3 +101,9 @@ let load_blockchain_from_file filename =
   let json = Yojson.Basic.from_channel ic in
   close_in ic;
   blockchain_of_json json
+
+let latest_tasks blockchain = (List.hd blockchain).tasks_csv
+let append_block blockchain block = block :: blockchain
+let empty = []
+let list_repr blockchain = blockchain
+let chain_of_list lst = lst

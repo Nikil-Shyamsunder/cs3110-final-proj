@@ -434,11 +434,14 @@ let test_create_genesis_block _ =
     that the block's index, previuos hash, has validity, and tasks are correct. *)
 let test_create_block _ =
   let difficulty = 2 in
-  let blockchain = [ create_genesis_block difficulty ] in
+  let blockchain =
+    Blockchain.append_block Blockchain.empty (create_genesis_block difficulty)
+  in
   let tasks_csv = [ [ "1"; "Task A" ]; [ "2"; "Task B" ] ] in
   let new_block = create_block blockchain tasks_csv difficulty in
   assert_equal new_block.index 1 ~msg:"New block index mismatch";
-  assert_equal new_block.previous_hash (List.hd blockchain).hash
+  let list_blockchain = Blockchain.list_repr blockchain in
+  assert_equal new_block.previous_hash (List.hd list_blockchain).hash
     ~msg:"New block previous hash mismatch";
   assert_bool "New block hash should satisfy difficulty"
     (is_valid_hash new_block.hash difficulty);
@@ -450,42 +453,43 @@ let test_create_block _ =
 let test_validate_blockchain _ =
   let difficulty = 2 in
   let genesis_block = create_genesis_block difficulty in
-  let blockchain = ref [ genesis_block ] in
+  let blockchain = ref (Blockchain.append_block empty genesis_block) in
   let tasks_csv_1 = [ [ "1"; "Task A" ] ] in
   let tasks_csv_2 = [ [ "2"; "Task B" ] ] in
   let block1 = create_block !blockchain tasks_csv_1 difficulty in
-  blockchain := block1 :: !blockchain;
+  blockchain := Blockchain.append_block !blockchain block1;
   let block2 = create_block !blockchain tasks_csv_2 difficulty in
-  blockchain := block2 :: !blockchain;
+  blockchain := Blockchain.append_block !blockchain block2;
   (* Tamper with a block *)
   let tampered_block = { block1 with hash = "tampered_hash" } in
-  let tampered_blockchain = tampered_block :: List.tl !blockchain in
+  let tampered_blockchain =
+    tampered_block :: List.tl (Blockchain.list_repr !blockchain)
+  in
   assert_bool "Invalid blockchain after tampering"
-    (not (validate_blockchain tampered_blockchain))
+    (not (validate_blockchain (Blockchain.chain_of_list tampered_blockchain)))
 
-(** [test_blockchain_to_json] creates a blockchain with multiple blocks and
-    verifies that the JSON representation of the blockchain matches the expected
-    JSON *)
 let test_save_blockchain_to_file _ =
   let difficulty = 2 in
   let genesis_block = create_genesis_block difficulty in
-  let blockchain = ref [ genesis_block ] in
+  let blockchain = append_block empty genesis_block in
   let tasks_csv_1 = [ [ "1"; "Task A" ] ] in
   let tasks_csv_2 = [ [ "2"; "Task B" ] ] in
-  let block1 = create_block !blockchain tasks_csv_1 difficulty in
-  blockchain := block1 :: !blockchain;
-  let block2 = create_block !blockchain tasks_csv_2 difficulty in
-  blockchain := block2 :: !blockchain;
+
+  let block1 = create_block blockchain tasks_csv_1 difficulty in
+  let blockchain = append_block blockchain block1 in
+
+  let block2 = create_block blockchain tasks_csv_2 difficulty in
+  let blockchain = append_block blockchain block2 in
 
   let temp_filename = "test_blockchain.csv" in
-  save_blockchain_to_file !blockchain temp_filename;
+  save_blockchain_to_file blockchain temp_filename;
 
   let read_json = Yojson.Basic.from_file temp_filename in
-  let read_blocks = read_json |> to_list in
+  let read_blocks = read_json |> Yojson.Basic.Util.to_list in
 
   (* Expected JSON to match with the actual json *)
-  let expected_json = blockchain_to_json !blockchain in
-  let expected_blocks = expected_json |> to_list in
+  let expected_json = blockchain_to_json (list_repr blockchain) in
+  let expected_blocks = expected_json |> Yojson.Basic.Util.to_list in
 
   assert_equal ~cmp:( = ) ~printer:Yojson.Basic.pretty_to_string
     (`List expected_blocks) (`List read_blocks);
@@ -498,27 +502,27 @@ let test_save_blockchain_to_file _ =
 let test_load_blockchain_from_file _ =
   let difficulty = 2 in
   let genesis_block = create_genesis_block difficulty in
-  let blockchain = ref [ genesis_block ] in
+  let blockchain = append_block empty genesis_block in
   let tasks_csv_1 = [ [ "1"; "Task A" ] ] in
   let tasks_csv_2 = [ [ "2"; "Task B" ] ] in
 
-  let block1 = create_block !blockchain tasks_csv_1 difficulty in
-  blockchain := block1 :: !blockchain;
+  let block1 = create_block blockchain tasks_csv_1 difficulty in
+  let blockchain = append_block blockchain block1 in
 
-  let block2 = create_block !blockchain tasks_csv_2 difficulty in
-  blockchain := block2 :: !blockchain;
+  let block2 = create_block blockchain tasks_csv_2 difficulty in
+  let blockchain = append_block blockchain block2 in
 
   let temp_filename = "test_blockchain.json" in
-  save_blockchain_to_file !blockchain temp_filename;
+  save_blockchain_to_file blockchain temp_filename;
 
   let loaded_blockchain = load_blockchain_from_file temp_filename in
 
   (* Expected JSON to match with the actual json *)
-  let expected_json = blockchain_to_json !blockchain in
-  let expected_blocks = expected_json |> to_list in
+  let expected_json = blockchain_to_json (list_repr blockchain) in
+  let expected_blocks = expected_json |> Yojson.Basic.Util.to_list in
 
-  let loaded_json = blockchain_to_json loaded_blockchain in
-  let loaded_blocks = loaded_json |> to_list in
+  let loaded_json = blockchain_to_json (list_repr loaded_blockchain) in
+  let loaded_blocks = loaded_json |> Yojson.Basic.Util.to_list in
 
   assert_equal ~cmp:( = ) ~printer:Yojson.Basic.pretty_to_string
     (`List expected_blocks) (`List loaded_blocks);
