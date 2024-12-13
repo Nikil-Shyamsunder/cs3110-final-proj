@@ -93,7 +93,9 @@ let doctor_driver username pwd role lst =
   print_endline "Enter prescription:";
   let prescription = read_line () in
   Doctor.add_diagnosis_prescription tasks_csv accounts_csv username patient
-    diagnosis prescription
+    diagnosis prescription;
+  print_endline
+    "Your prescription has been entered! Successfully exiting program..."
 
 (* Helper function for pharmacists to vote on tasks *)
 let vote_on_task_driver accounts_csv_ref (tasks_csv_ref : Task.t ref) user =

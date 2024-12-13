@@ -1,5 +1,40 @@
 [
   {
+    "index": 9,
+    "timestamp": "0.129563",
+    "tasks_csv": [
+      [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
+      [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
+      [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ],
+      [ "4", "cancer", "radiation therapy", "1", "[pharm]", "0", "[]" ],
+      [
+        "5", "ring disease", "amoxycillin with clavulinate", "0", "[]", "0",
+        "[]"
+      ],
+      [ "6", "lyme's disease", "hospitalization", "0", "[]", "0", "[]" ]
+    ],
+    "previous_hash": "005c58b7f22444e7ccd01431c4ccf94c",
+    "nonce": 55,
+    "hash": "00ea2c69d30ce60f4df30ee8efaf8057"
+  },
+  {
+    "index": 8,
+    "timestamp": "0.081154",
+    "tasks_csv": [
+      [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
+      [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
+      [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ],
+      [ "4", "cancer", "radiation therapy", "1", "[pharm]", "0", "[]" ],
+      [
+        "5", "ring disease", "amoxycillin with clavulinate", "0", "[]", "0",
+        "[]"
+      ]
+    ],
+    "previous_hash": "00953dd45d2794d61c0cf7f7fef0734e",
+    "nonce": 71,
+    "hash": "005c58b7f22444e7ccd01431c4ccf94c"
+  },
+  {
     "index": 7,
     "timestamp": "0.0258",
     "tasks_csv": [
