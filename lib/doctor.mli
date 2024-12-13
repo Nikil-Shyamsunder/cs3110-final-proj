@@ -17,6 +17,7 @@ val tasks : t -> int list
 (** [tasks acc] returns the task list of the user [acc]. *)
 
 val add_diagnosis_prescription :
-  Csv.t ref -> Csv.t ref -> string -> string -> string -> string -> unit
+  Task.t ref -> Csv.t ref -> string -> string -> string -> string -> unit
 (** [add_diagnosis_prescription accounts_csv prescriptions_csv doctor patient
-     diagnosis] adds a diagnosis and prescription to the prescriptions CSV. *)
+     diagnosis]
+    adds a diagnosis and prescription to the prescriptions CSV. *)

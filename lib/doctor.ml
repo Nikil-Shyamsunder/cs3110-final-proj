@@ -1,9 +1,9 @@
 include Account
 
-let add_diagnosis_prescription (tasks_csv_ref : Csv.t ref)
+let add_diagnosis_prescription (tasks_csv_ref : Task.t ref)
     (accounts_csv_ref : Csv.t ref) (doctor : string) (patient : string)
     diagnosis prescription =
-  let csv = !tasks_csv_ref in
+  let csv = Task.to_csv !tasks_csv_ref in
   let new_id =
     (* Compute the new ID by finding the maximum ID in the existing rows *)
     List.fold_left
@@ -17,7 +17,7 @@ let add_diagnosis_prescription (tasks_csv_ref : Csv.t ref)
     [ string_of_int new_id; diagnosis; prescription; "0"; "[]"; "0"; "[]" ]
   in
   (* Append the new record to the CSV data *)
-  tasks_csv_ref := csv @ [ new_record ];
+  tasks_csv_ref := Task.of_csv (csv @ [ new_record ]);
 
   (* Update the tasks column for the patient and doctor *)
   update_user_tasks accounts_csv_ref patient new_id;

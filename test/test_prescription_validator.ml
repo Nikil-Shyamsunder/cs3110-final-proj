@@ -190,10 +190,11 @@ let test_get_user_task_list _ =
 let test_add_diagnosis_prescription _ =
   let tasks_csv_ref =
     ref
-      [
-        [ "1"; "Diagnosis1"; "Prescription1"; "0"; "[]"; "0"; "[]" ];
-        [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "0"; "[]" ];
-      ]
+      (Task.of_csv
+         [
+           [ "1"; "Diagnosis1"; "Prescription1"; "0"; "[]"; "0"; "[]" ];
+           [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "0"; "[]" ];
+         ])
   in
   let accounts_csv_ref =
     ref
@@ -211,7 +212,8 @@ let test_add_diagnosis_prescription _ =
       [ "3"; "Diagnosis3"; "Prescription3"; "0"; "[]"; "0"; "[]" ];
     ]
   in
-  assert_equal expected_tasks_csv !tasks_csv_ref
+  assert_equal expected_tasks_csv
+    (Task.to_csv !tasks_csv_ref)
     ~msg:"tasks CSV not updated correctly";
   let expected_accounts_csv =
     [
@@ -237,7 +239,7 @@ let test_get_all_task_ids _ =
     ]
   in
   Csv.save temp_file csv_data;
-  let tasks_csv_ref = ref (Csv.load temp_file) in
+  let tasks_csv_ref = ref (Task.of_csv (Csv.load temp_file)) in
   let task_ids = get_all_task_ids tasks_csv_ref in
   assert_equal [ 3; 2; 1 ] task_ids ~msg:"Failed to get all task ids correctly.";
   Sys.remove temp_file
@@ -255,7 +257,7 @@ let test_find_task_row _ =
     ]
   in
   Csv.save temp_file csv_data;
-  let tasks_csv_ref = ref (Csv.load temp_file) in
+  let tasks_csv_ref = ref (Task.of_csv (Csv.load temp_file)) in
   let task_row = find_task_row tasks_csv_ref 2 in
   assert_equal
     (Some [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "0"; "[]" ])
@@ -290,7 +292,7 @@ let test_vote_on_task_core _ =
   Csv.save temp_file_tasks tasks_csv_data;
   Csv.save temp_file_accounts accounts_csv_data;
 
-  let tasks_csv = ref (Csv.load temp_file_tasks) in
+  let tasks_csv = ref (Task.of_csv (Csv.load temp_file_tasks)) in
   let accounts_csv = ref (Csv.load temp_file_accounts) in
 
   let user = Pharmacist.create_user "alice" "password1" "pharmacist" [] in
@@ -301,7 +303,8 @@ let test_vote_on_task_core _ =
   vote_on_task_core accounts_csv tasks_csv user 1 "yes";
 
   let updated_task_row =
-    List.hd (List.filter (fun row -> List.hd row = "1") !tasks_csv)
+    List.hd
+      (List.filter (fun row -> List.hd row = "1") (Task.to_csv !tasks_csv))
   in
   assert_equal
     [ "1"; "Diagnosis1"; "Prescription1"; "1"; "[alice]"; "0"; "[]" ]
@@ -316,7 +319,8 @@ let test_vote_on_task_core _ =
   vote_on_task_core accounts_csv tasks_csv user2 1 "no";
 
   let updated_task_row_no =
-    List.hd (List.filter (fun row -> List.hd row = "1") !tasks_csv)
+    List.hd
+      (List.filter (fun row -> List.hd row = "1") (Task.to_csv !tasks_csv))
   in
   assert_equal
     [ "1"; "Diagnosis1"; "Prescription1"; "1"; "[alice]"; "1"; "[alice2]" ]
@@ -334,7 +338,8 @@ let test_vote_on_task_core _ =
   vote_on_task_core accounts_csv tasks_csv user3 2 "no";
 
   let updated_task_row_no =
-    List.hd (List.filter (fun row -> List.hd row = "2") !tasks_csv)
+    List.hd
+      (List.filter (fun row -> List.hd row = "2") (Task.to_csv !tasks_csv))
   in
   assert_equal
     [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "1"; "[alice3]" ]
@@ -352,7 +357,8 @@ let test_vote_on_task_core _ =
   vote_on_task_core accounts_csv tasks_csv user2 2 "no";
 
   let updated_task_row_no =
-    List.hd (List.filter (fun row -> List.hd row = "2") !tasks_csv)
+    List.hd
+      (List.filter (fun row -> List.hd row = "2") (Task.to_csv !tasks_csv))
   in
   assert_equal
     [ "2"; "Diagnosis2"; "Prescription2"; "0"; "[]"; "2"; "[alice2,alice3]" ]
@@ -435,8 +441,7 @@ let test_create_genesis_block _ =
     ~msg:"Genesis block tasks mismatch"
 
 (** [test_create_block] checks if the blocks are created properly and the verify
-    that the block's index, previuos hash, has validity, and tasks are correct.
-*)
+    that the block's index, previuos hash, has validity, and tasks are correct. *)
 let test_create_block _ =
   let difficulty = 2 in
   let blockchain =

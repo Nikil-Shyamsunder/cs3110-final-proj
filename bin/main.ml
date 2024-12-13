@@ -18,7 +18,7 @@ let () =
   if Blockchain.validate_blockchain blockchain then ()
   else failwith "You're blockchain is invalid. You cannot login. Exiting... "
 
-let tasks_csv = ref (Blockchain.latest_tasks blockchain)
+let tasks_csv = ref (Task.of_csv (Blockchain.latest_tasks blockchain))
 
 (* Welcome message *)
 let welcome_message () =
@@ -86,7 +86,7 @@ let doctor_driver username pwd role lst =
     diagnosis prescription
 
 (* Helper function for pharmacists to vote on tasks *)
-let vote_on_task_driver accounts_csv_ref tasks_csv_ref user =
+let vote_on_task_driver accounts_csv_ref (tasks_csv_ref : Task.t ref) user =
   (* Fetch all tasks *)
   let all_task_ids = Pharmacist.get_all_task_ids tasks_csv_ref in
   let user_task_ids = Pharmacist.tasks user in
@@ -159,6 +159,6 @@ match read_int_opt () with
 ;;
 
 Csv.save accounts_path !accounts_csv;
-let new_block = Blockchain.create_block blockchain !tasks_csv 2 in
+let new_block = Blockchain.create_block blockchain (Task.to_csv !tasks_csv) 2 in
 let blockchain = Blockchain.append_block blockchain new_block in
 Blockchain.save_blockchain_to_file blockchain "data/blockchain.json"

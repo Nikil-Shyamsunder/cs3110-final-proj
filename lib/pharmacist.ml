@@ -10,16 +10,18 @@ include Account
    task ID should be a non-negative integer. The tasks_csv should not contain
    any duplicate task IDs. The tasks_csv should not contain any malformed rows
    (i.e., rows with missing or extra columns). *)
-let get_all_task_ids (tasks_csv : Csv.t ref) =
+let get_all_task_ids (tasks_csv : Task.t ref) =
+  let csv = Task.to_csv !tasks_csv in
   List.fold_left
     (fun acc row ->
       match row with
       | id :: _ -> ( try int_of_string id :: acc with _ -> acc)
       | _ -> acc)
-    [] !tasks_csv
+    [] csv
 
-let find_task_row (tasks_csv : Csv.t ref) task_id =
-  List.find_opt (fun row -> List.hd row = string_of_int task_id) !tasks_csv
+let find_task_row (tasks_csv : Task.t ref) task_id =
+  let csv = Task.to_csv !tasks_csv in
+  List.find_opt (fun row -> List.hd row = string_of_int task_id) csv
 
 (** [update_task_csv tasks_csv task_id username vote] is a helper function that
     updates the [tasks_csv] whenver a user votes on a task_id with yes or no
@@ -70,7 +72,9 @@ let update_task_csv (tasks_csv : Csv.t ref) task_id username vote =
         else row)
       !tasks_csv
 
-let vote_on_task_core (accounts_csv : Csv.t ref) (tasks_csv : Csv.t ref)
+let vote_on_task_core (accounts_csv : Csv.t ref) (tasks_csv : Task.t ref)
     (user : t) task_id vote =
-  update_task_csv tasks_csv task_id (username user) vote;
-  update_user_tasks accounts_csv (username user) task_id
+  let csv = ref (Task.to_csv !tasks_csv) in
+  update_task_csv csv task_id (username user) vote;
+  update_user_tasks accounts_csv (username user) task_id;
+  tasks_csv := Task.of_csv !csv
