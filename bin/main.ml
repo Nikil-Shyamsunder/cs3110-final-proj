@@ -7,6 +7,10 @@ module Task = Prescription_validator.Task
 module Blockchain = Prescription_validator.Blockchain
 
 (* =========================== DRIVER PROGRAM =========================== *)
+(* Quits the program gracefully with message [msg] *)
+let fail_gracefully msg =
+  print_endline ("An error occured: " ^ msg);
+  exit 1
 
 (* Set file paths *)
 let accounts_path = "data/accounts.csv"
@@ -20,7 +24,9 @@ let blockchain = Blockchain.load_blockchain_from_file blockchain_path
 
 let () =
   if Blockchain.validate_blockchain blockchain then ()
-  else failwith "You're blockchain is invalid. You cannot login. Exiting... "
+  else
+    fail_gracefully
+      "You're blockchain is invalid. You cannot login. Exiting... "
 
 let tasks_csv = ref (Task.of_csv (Blockchain.latest_tasks blockchain))
 
@@ -142,27 +148,37 @@ let vote_on_task_driver accounts_csv_ref (tasks_csv_ref : Task.t ref) user =
 let pharmacist_driver username pwd role lst =
   let usr = Pharmacist.create_user username pwd role lst in
   vote_on_task_driver accounts_csv tasks_csv usr
-;;
 
 (* Entrypoint *)
-welcome_message ();
-match read_int_opt () with
-| Some 1 -> (
-    (* Login flow *)
-    let u, p, r, lst = login () in
-    match r with
-    | "patient" -> patient_driver u p r lst
-    | "doctor" -> doctor_driver u p r lst
-    | "pharmacist" -> pharmacist_driver u p r lst
-    | _ -> failwith "Invalid role")
-| Some 2 ->
-    (* Signup flow *)
-    signup ()
-| Some n -> failwith "Invalid number; try again. Exiting the program..."
-| None -> failwith "Invalid input; try again. Exiting the program."
-;;
 
-Csv.save accounts_path !accounts_csv;
-let new_block = Blockchain.create_block blockchain (Task.to_csv !tasks_csv) 2 in
-let blockchain = Blockchain.append_block blockchain new_block in
-Blockchain.save_blockchain_to_file blockchain "data/blockchain.json"
+let main () =
+  try
+    welcome_message ();
+    match read_int_opt () with
+    | Some 1 -> (
+        (* Login flow *)
+        let u, p, r, lst = login () in
+        match r with
+        | "patient" -> patient_driver u p r lst
+        | "doctor" -> doctor_driver u p r lst
+        | "pharmacist" -> pharmacist_driver u p r lst
+        | _ -> fail_gracefully "Invalid role")
+    | Some 2 ->
+        (* Signup flow *)
+        signup ()
+    | Some _ ->
+        fail_gracefully "Invalid number; try again. Exiting the program..."
+    | None -> fail_gracefully "Invalid input; try again. Exiting the program."
+  with
+  | Failure msg -> fail_gracefully msg
+  | exn -> fail_gracefully (Printexc.to_string exn)
+
+(* Finalizing operations *)
+let () =
+  main ();
+  Csv.save accounts_path !accounts_csv;
+  let new_block =
+    Blockchain.create_block blockchain (Task.to_csv !tasks_csv) 2
+  in
+  let blockchain = Blockchain.append_block blockchain new_block in
+  Blockchain.save_blockchain_to_file blockchain "data/blockchain.json"
