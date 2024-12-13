@@ -21,8 +21,6 @@ type t = Block.t list
     - The blocks must be ordered by their [index], starting from 0 and
       increasing sequentially. *)
 
-type t = Block.t list
-
 let create_genesis_block difficulty =
   let timestamp = string_of_float (Sys.time ()) in
   mine_block 0 timestamp [ [ "Genesis Block" ] ] "0" difficulty
