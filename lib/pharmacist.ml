@@ -1,5 +1,15 @@
 include Account
 
+(* AF: The Pharmacist module represents a pharmacist account in the system. It
+   includes all the functionalities of an Account, and provides additional
+   functionalities specific to pharmacists, such as retrieving all task IDs from
+   a CSV file and finding a specific task row by task ID. *)
+
+(* RI: - The tasks_csv reference point to a valid CSV structure where each row
+   in the tasks_csv should have a valid task ID as the first element and the
+   task ID should be a non-negative integer. The tasks_csv should not contain
+   any duplicate task IDs. The tasks_csv should not contain any malformed rows
+   (i.e., rows with missing or extra columns). *)
 let get_all_task_ids (tasks_csv : Csv.t ref) =
   List.fold_left
     (fun acc row ->

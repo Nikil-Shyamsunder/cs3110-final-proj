@@ -1,6 +1,9 @@
 type t = Csv.t
 
-let display_tasks_from_ids (tasks_csv : Csv.t) task_ids =
+let of_csv csv = csv
+let to_csv t = t
+
+let display_tasks_from_ids (tasks_csv : t) task_ids =
   let find_task tasks_csv task_id =
     List.find_opt
       (fun row ->
@@ -41,7 +44,7 @@ let display_tasks_from_ids (tasks_csv : Csv.t) task_ids =
     in
     header ^ task_rows
 
-let display_tasks_without_votes (tasks_csv : Csv.t) task_ids =
+let display_tasks_without_votes (tasks_csv : t) task_ids =
   (* Helper function to find a task by task ID in the tasks CSV *)
   let find_task tasks_csv task_id =
     List.find_opt

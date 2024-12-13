@@ -1,7 +1,7 @@
 include Account
 open Csv
 
-let display_prescription_statuses tasks_csv user =
+let display_prescription_statuses (tasks_csv : Task.t ref) user =
   (* Check if the user's task list is empty and return a string *)
   match tasks user with
   | [] ->
