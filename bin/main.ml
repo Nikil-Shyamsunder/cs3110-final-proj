@@ -18,7 +18,7 @@ let () =
   if Blockchain.validate_blockchain blockchain then ()
   else failwith "You're blockchain is invalid. You cannot login. Exiting... "
 
-let tasks_csv = ref (List.hd blockchain).tasks_csv
+let tasks_csv = ref (Blockchain.latest_tasks blockchain)
 
 (* Welcome message *)
 let welcome_message () =
@@ -160,5 +160,5 @@ match read_int_opt () with
 
 Csv.save accounts_path !accounts_csv;
 let new_block = Blockchain.create_block blockchain !tasks_csv 2 in
-let blockchain = new_block :: blockchain in
+let blockchain = Blockchain.append_block blockchain new_block in
 Blockchain.save_blockchain_to_file blockchain "data/blockchain.json"

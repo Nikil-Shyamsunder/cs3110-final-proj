@@ -1,6 +1,6 @@
 open Block
 
-type t = Block.t list
+type t
 (** Type for a blockchain *)
 
 val create_genesis_block : int -> Block.t
@@ -39,3 +39,20 @@ val save_blockchain_to_file : t -> string -> unit
 val load_blockchain_from_file : string -> t
 (** [load_blockchain_from_file filename] loads the blockchain from a file called
     filename here *)
+
+val latest_tasks : t -> Csv.t
+(** [latest_tasks blockchain] are the latest tasks on the blockchain *)
+
+val append_block : t -> Block.t -> t
+(** [append_block blockchain block] appends [block] to the front of this
+    [blockchain].*)
+
+val empty : t
+(** [empty] is the empty blockchain. *)
+
+val list_repr : t -> Block.t list
+(** [list_repr blockchain] is a list of Blocks representing this [blockchain]*)
+
+val chain_of_list : Block.t list -> t
+(** [chain_of_list lst blockchain] is the Blockchain.t representation of the
+    list *)

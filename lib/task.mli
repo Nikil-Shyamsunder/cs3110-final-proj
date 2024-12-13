@@ -9,5 +9,4 @@ val display_tasks_without_votes : t -> int list -> string
     of the tasks with the given [task_ids] that have not been voted on. *)
 
 val string_to_task_ids : string -> int list
-(** [string_to_task_ids str] returns a list of task ids from the string [str].
-*)
+(** [string_to_task_ids str] returns a list of task ids from the string [str]. *)
