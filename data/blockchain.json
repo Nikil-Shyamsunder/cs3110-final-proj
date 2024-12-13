@@ -1,15 +1,91 @@
 [
   {
+    "index": 7,
+    "timestamp": "0.0258",
+    "tasks_csv": [
+      [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
+      [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
+      [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ],
+      [ "4", "cancer", "radiation therapy", "1", "[pharm]", "0", "[]" ]
+    ],
+    "previous_hash": "00c7eb8a436ed92a428aa43d054068e7",
+    "nonce": 668,
+    "hash": "00953dd45d2794d61c0cf7f7fef0734e"
+  },
+  {
+    "index": 6,
+    "timestamp": "0.023098",
+    "tasks_csv": [
+      [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
+      [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
+      [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ],
+      [ "4", "cancer", "radiation therapy", "1", "[pharm]", "0", "[]" ]
+    ],
+    "previous_hash": "0008b1a0ec3718ae4e59e70d51fd109d",
+    "nonce": 103,
+    "hash": "00c7eb8a436ed92a428aa43d054068e7"
+  },
+  {
+    "index": 5,
+    "timestamp": "0.023286",
+    "tasks_csv": [
+      [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
+      [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
+      [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ],
+      [ "4", "cancer", "radiation therapy", "0", "[]", "0", "[]" ]
+    ],
+    "previous_hash": "0008b1da250b5a38dd127e1ef5e66161",
+    "nonce": 51,
+    "hash": "0008b1a0ec3718ae4e59e70d51fd109d"
+  },
+  {
+    "index": 4,
+    "timestamp": "0.022799",
+    "tasks_csv": [
+      [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
+      [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
+      [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ],
+      [ "4", "cancer", "radiation therapy", "0", "[]", "0", "[]" ]
+    ],
+    "previous_hash": "00f2140e76f6ece3c7537c76c9fc6b67",
+    "nonce": 398,
+    "hash": "0008b1da250b5a38dd127e1ef5e66161"
+  },
+  {
+    "index": 3,
+    "timestamp": "0.047435",
+    "tasks_csv": [
+      [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
+      [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
+      [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ]
+    ],
+    "previous_hash": "00259f6e36adb9080b98c233791457f4",
+    "nonce": 103,
+    "hash": "00f2140e76f6ece3c7537c76c9fc6b67"
+  },
+  {
+    "index": 2,
+    "timestamp": "0.0323",
+    "tasks_csv": [
+      [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
+      [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
+      [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ]
+    ],
+    "previous_hash": "0084e7998288e6eac32fe45ec34acc5a",
+    "nonce": 56,
+    "hash": "00259f6e36adb9080b98c233791457f4"
+  },
+  {
     "index": 1,
-    "timestamp": "0.023806",
+    "timestamp": "0.025841",
     "tasks_csv": [
       [ "1", "cold", "nyquil", "0", "[]", "0", "[]" ],
       [ "2", "covid", "vaccine", "0", "[]", "1", "[pharm]" ],
       [ "3", "strep", "antibiotic", "0", "[]", "1", "[pharm]" ]
     ],
     "previous_hash": "0",
-    "nonce": 545,
-    "hash": "0"
+    "nonce": 341,
+    "hash": "0084e7998288e6eac32fe45ec34acc5a"
   },
   {
     "index": 0,

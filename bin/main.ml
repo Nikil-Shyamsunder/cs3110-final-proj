@@ -14,6 +14,10 @@ let blockchain_path = "data/blockchain.json"
 let accounts_csv = ref (Csv.load accounts_path)
 let blockchain = Blockchain.load_blockchain_from_file blockchain_path
 
+(* let () = Blockchain.save_blockchain_to_file (Blockchain.append_block
+   blockchain (Blockchain.create_block blockchain (Csv.load "data/tasks.csv")
+   2)) "data/blockchain.json" *)
+
 let () =
   if Blockchain.validate_blockchain blockchain then ()
   else failwith "You're blockchain is invalid. You cannot login. Exiting... "

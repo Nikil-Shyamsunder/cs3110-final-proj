@@ -48,8 +48,11 @@ let mine_block index timestamp tasks_csv previous_hash difficulty =
       Printf.sprintf "%d|%s|%s|%s|%d" index timestamp (csv_to_string tasks_csv)
         previous_hash nonce
     in
+    (* print_endline candidate; *)
     let hash_code = hash candidate in
-    if is_valid_hash hash_code difficulty then (nonce, hash_code)
+    if is_valid_hash hash_code difficulty then
+      (* let () = print_endline hash_code in *)
+      (nonce, hash_code)
     else find_nonce (nonce + 1)
   in
   let nonce, final_hash = find_nonce 0 in

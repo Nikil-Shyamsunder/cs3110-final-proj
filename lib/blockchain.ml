@@ -34,7 +34,9 @@ let create_block (blockchain : t) tasks_csv difficulty =
     | last_block :: _ -> get_hash last_block
   in
   let timestamp = string_of_float timestamp in
-  mine_block index timestamp tasks_csv previous_hash difficulty
+  let block = mine_block index timestamp tasks_csv previous_hash difficulty in
+  (* let () = print_endline (get_hash block) in *)
+  block
 
 let validate_blockchain (blockchain : t) : bool =
   let rec validate_chain = function
@@ -66,7 +68,7 @@ let block_to_json (block : Block.t) =
              (tasks_csv block)) );
       ("previous_hash", `String (previous_hash block));
       ("nonce", `Int (nonce block));
-      ("hash", `String (previous_hash block));
+      ("hash", `String (get_hash block));
     ]
 
 (** [block_of_json json] converts a json object into a block. *)
