@@ -1,11 +1,4 @@
-type t = {
-  index : int;
-  timestamp : string;
-  tasks_csv : Csv.t;
-  previous_hash : string;
-  nonce : int;
-  hash : string;
-}
+type t
 
 val hash : string -> string
 (** Hashes a string using Digest.
@@ -53,3 +46,27 @@ val is_valid_hash : string -> int -> bool
 
 val mine_block : int -> string -> Csv.t -> string -> int -> t
 (** Mines a new block with the given parameters and difficulty. *)
+
+val create_block : int -> string -> Csv.t -> string -> int -> string -> t
+(** [create_block index timestamp tasks_csv previous_hash nonce hash] creates a
+    block with the given fields. *)
+
+(** Getter functions for each field of the block *)
+
+val index : t -> int
+(** [index block] retrieves the index of the block. *)
+
+val timestamp : t -> string
+(** [timestamp block] retrieves the timestamp of the block. *)
+
+val tasks_csv : t -> Csv.t
+(** [tasks_csv block] retrieves the tasks CSV of the block. *)
+
+val previous_hash : t -> string
+(** [previous_hash block] retrieves the previous hash of the block. *)
+
+val nonce : t -> int
+(** [nonce block] retrieves the nonce of the block. *)
+
+val get_hash : t -> string
+(** [get_hash block] retrieves the hash of the block. *)

@@ -13,7 +13,7 @@ let create_block (blockchain : t) tasks_csv difficulty =
   let previous_hash =
     match blockchain with
     | [] -> string_of_int 0
-    | last_block :: _ -> last_block.hash
+    | last_block :: _ -> get_hash last_block
   in
   let timestamp = string_of_float timestamp in
   mine_block index timestamp tasks_csv previous_hash difficulty
@@ -26,9 +26,9 @@ let validate_blockchain (blockchain : t) : bool =
         let computed_hash = hash (block_to_string current_block) in
         (* Check if the hash matches and if the previous hash links correctly *)
         if
-          current_block.hash = computed_hash
-          && current_block.previous_hash = previous_block.hash
-          && is_valid_hash current_block.hash 2
+          get_hash current_block = computed_hash
+          && previous_hash current_block = get_hash previous_block
+          && is_valid_hash (get_hash current_block) 2
         then validate_chain (previous_block :: rest)
         else false
   in
@@ -39,31 +39,31 @@ let validate_blockchain (blockchain : t) : bool =
 let block_to_json (block : Block.t) =
   `Assoc
     [
-      ("index", `Int block.index);
-      ("timestamp", `String block.timestamp);
+      ("index", `Int (index block));
+      ("timestamp", `String (timestamp block));
       ( "tasks_csv",
         `List
           (List.map
              (fun row -> `List (List.map (fun col -> `String col) row))
-             block.tasks_csv) );
-      ("previous_hash", `String block.previous_hash);
-      ("nonce", `Int block.nonce);
-      ("hash", `String block.hash);
+             (tasks_csv block)) );
+      ("previous_hash", `String (previous_hash block));
+      ("nonce", `Int (nonce block));
+      ("hash", `String (previous_hash block));
     ]
 
 (** [block_of_json json] converts a json object into a block. *)
 let block_of_json json =
   let open Yojson.Basic.Util in
-  {
-    index = json |> member "index" |> to_int;
-    timestamp = json |> member "timestamp" |> to_string;
-    tasks_csv =
-      json |> member "tasks_csv" |> to_list
-      |> List.map (fun row -> row |> to_list |> List.map to_string);
-    previous_hash = json |> member "previous_hash" |> to_string;
-    nonce = json |> member "nonce" |> to_int;
-    hash = json |> member "hash" |> to_string;
-  }
+  let index = json |> member "index" |> to_int in
+  let timestamp = json |> member "timestamp" |> to_string in
+  let tasks_csv =
+    json |> member "tasks_csv" |> to_list
+    |> List.map (fun row -> row |> to_list |> List.map to_string)
+  in
+  let previous_hash = json |> member "previous_hash" |> to_string in
+  let nonce = json |> member "nonce" |> to_int in
+  let hash = json |> member "hash" |> to_string in
+  Block.create_block index timestamp tasks_csv previous_hash nonce hash
 
 let blockchain_to_json blockchain = `List (List.map block_to_json blockchain)
 
@@ -82,7 +82,7 @@ let load_blockchain_from_file filename =
   close_in ic;
   blockchain_of_json json
 
-let latest_tasks blockchain = (List.hd blockchain).tasks_csv
+let latest_tasks blockchain = tasks_csv (List.hd blockchain)
 let append_block blockchain block = block :: blockchain
 let empty = []
 let list_repr blockchain = blockchain
