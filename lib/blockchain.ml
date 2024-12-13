@@ -2,6 +2,26 @@ open Block
 open Yojson.Basic
 
 type t = Block.t list
+(** AF:
+    - A value of type [t] represents a blockchain, which is a sequence of
+      blocks.
+    - Each block in the blockchain is linked to the previous block by the
+      [previous_hash] field, forming a chain.
+    - The first block in the chain is the genesis block, which serves as the
+      foundation of the blockchain.
+
+    RI:
+    - The blockchain must have at least one block (the genesis block).
+    - Each block's [previous_hash] must match the [hash] of the preceding block.
+    - The hash of each block must correctly match the hash of its serialized
+      data as computed by [block_to_string].
+    - The genesis block's [previous_hash] must be "0".
+    - The difficulty requirement (e.g., leading zeros in the hash) must be
+      satisfied for every block.
+    - The blocks must be ordered by their [index], starting from 0 and
+      increasing sequentially. *)
+
+type t = Block.t list
 
 let create_genesis_block difficulty =
   let timestamp = string_of_float (Sys.time ()) in

@@ -1,4 +1,19 @@
 type t
+(** AF: - A value of type [t] represents a task
+    - The task has a csv format where each row corresponds to a task with
+      specific attributes.
+    - Each row contains: - Task ID (unique integer) - Diagnosis (string) -
+      Prescription (string) - Yes Vote (integer) - No Vote (integer) - The rows
+      collectively represent the tasks stored in the system, with specific
+      operations for displaying tasks and processing task-related information.
+
+    RI: - Each task has an id, its corresponding users, and its votes. - Task
+    IDs in the table must be unique. - The functions should handle invalid task
+    IDs gracefully, either by reporting an error or skipping the invalid row. -
+    Strings representing numeric values (e.g., Task ID, Yes Vote, No Vote) must
+    be convertible to integers without errors. - Task-related functions assume
+    task IDs referenced as inputs exist in the table or provide appropriate
+    error messages if not found. *)
 
 val of_csv : Csv.t -> t
 (** [of_csv csv] creates a task list from a CSV. *)
